@@ -6,7 +6,6 @@ import scala.concurrent.{ExecutionContext, Future}
 trait Invoker {
   _: Action[_] =>
   type Response
-  val actionKey: ActionKey = ActionKey(getClass)
   protected def invoke(): Response
 }
 

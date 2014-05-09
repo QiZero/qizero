@@ -32,6 +32,9 @@ object Build extends Build {
   val testkit = module("qizero-testkit")
     .dependsOn(action, persistence, service)
     .settings(libraryDependencies ++= testkitDeps)
+
+  val all = module("qizero-all")
+    .dependsOn(logging, config, i18n, action, persistence, service)
   // -------------------------------------------------------------------------------------------------------------------
   // Utils
   // -------------------------------------------------------------------------------------------------------------------

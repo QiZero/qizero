@@ -11,3 +11,5 @@ libraryDependencies ++= Seq(
 )
 
 lazy val root = project in file(".")
+
+root.enablePlugins(play.PlayScala)

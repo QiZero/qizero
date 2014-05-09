@@ -13,19 +13,25 @@ object ActionKey {
       case Some(key) => key
       case None =>
         val key = new ActionKey(name)
-        keys.putIfAbsent(name, key)
+        keys.put(name, key)
+        key
     }
   }
 
-  def apply(clazz: Class[_]): ActionKey = {
-    apply(getNameFromClass(clazz))
-  }
+  def apply(clazz: Class[_]): ActionKey = apply(getName(clazz))
 
-  private def getNameFromClass(clazz: Class[_]): String = {
+  private def getName(clazz: Class[_]): String = {
     Option(names.get(clazz)) match {
       case Some(name) => name
       case None =>
-        names.putIfAbsent(clazz, clazz.getSimpleName)
+        val name = getNameFromClass(clazz)
+        names.put(clazz, name)
+        name
     }
+  }
+
+  private def getNameFromClass(clazz: Class[_]): String = {
+    val name = clazz.getSimpleName
+    name
   }
 }

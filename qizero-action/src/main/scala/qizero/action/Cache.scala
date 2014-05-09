@@ -11,21 +11,22 @@ trait Cache extends Invoker {
   protected def cacheKey: String
 
   abstract override protected def invoke(): Response = {
-    Cache(actionKey) match {
-      case Some(value) => value
-      case None => super.invoke()
-    }
+    // Cache(actionKey) match {
+    //   case Some(value) => value
+    //   case None => super.invoke()
+    // }
+    ???
   }
 }
 
 object Cache {
-  private val caches = new ConcurrentHashMap[ActionKey, DynamicVariable[Option[Nothing]]]
+  private val caches = new ConcurrentHashMap[ActionKey, DynamicVariable[Option[Any]]]
 
-  def apply(key: ActionKey): Option[Nothing] = {
+  def apply(key: ActionKey): Option[Any] = {
     Option(caches.get(key)) match {
       case Some(dyn) => dyn.value
       case None =>
-        val dyn = new DynamicVariable[Option[Nothing]](None)
+        val dyn = new DynamicVariable[Option[Any]](None)
         caches.putIfAbsent(key, dyn)
         None
     }

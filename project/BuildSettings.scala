@@ -15,8 +15,7 @@ object BuildSettings {
     javacOptions ++= Seq(
       "-source", "1.7",
       "-target", "1.7"
-    ),
-    testListeners += new eu.henkelmann.sbt.JUnitXmlTestsListener(target.value.getAbsolutePath)
+    )
   ) ++ Publish.settings ++ Release.settings
 
   object Publish {
