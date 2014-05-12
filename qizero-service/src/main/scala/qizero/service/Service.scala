@@ -2,13 +2,21 @@ package qizero.service
 
 import akka.actor._
 import akka.util.Timeout
+import qizero.action.Action
 import qizero.message.{Reply, Message}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-trait Service {
+trait Service extends Actor {
+
+  implicit class ActorRunner[R](action: Action[R]) {
+    final def reply(implicit context: ActorContext): Unit = {
+      implicit val dispatcher = context.dispatcher
+      akka.pattern.pipe(action.ask).pipeTo(context.sender)
+    }
+  }
 
 }
 

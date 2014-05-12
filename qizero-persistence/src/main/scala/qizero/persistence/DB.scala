@@ -1,10 +1,10 @@
 package qizero.persistence
 
 import java.util.concurrent.ConcurrentHashMap
-import qizero.config.Configurable
+import qizero.config.Config
 import scala.slick.driver._
 
-object DB extends Configurable("db") {
+object DB extends Config("db") {
 
   private val cachedDatabases = new ConcurrentHashMap[String, Database]()
 

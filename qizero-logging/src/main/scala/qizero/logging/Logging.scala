@@ -1,6 +1,6 @@
 package qizero.logging
 
-trait Loggable {
+trait Logging {
   @transient
   protected final lazy val log: Logger = Logger(getClass)
 }
