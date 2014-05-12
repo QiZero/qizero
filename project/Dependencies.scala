@@ -14,7 +14,10 @@ object Dependencies {
   private val config = "com.typesafe" % "config" % "1.2.0"
 
   // Persistence
-  private val slick = "com.typesafe.slick" % "slick_2.11.0-RC4" % "2.1.0-M1"
+  private val slick = "com.typesafe.slick" %% "slick" % "2.1.0-M1" cross CrossVersion.binaryMapped{
+    case "2.11" => "2.11.0-RC4"
+    case v => v
+  }
   private val h2 = "com.h2database" % "h2" % "1.3.175"
 
   // Akka

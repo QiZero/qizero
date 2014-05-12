@@ -36,6 +36,13 @@ object Build extends Build {
   val all = module("qizero-all")
     .dependsOn(logging, config, i18n, action, persistence, service)
   // -------------------------------------------------------------------------------------------------------------------
+  // Root
+  // -------------------------------------------------------------------------------------------------------------------
+  val root = Project("qizero", file("."))
+    .aggregate(logging, config, i18n, action, persistence, service)
+    .settings(basicSettings: _*)
+    .settings(Publish.noPublishing: _*)
+  // -------------------------------------------------------------------------------------------------------------------
   // Utils
   // -------------------------------------------------------------------------------------------------------------------
   override val settings = super.settings ++ Seq(
