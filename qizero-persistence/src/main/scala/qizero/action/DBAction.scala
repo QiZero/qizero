@@ -4,8 +4,6 @@ import qizero.persistence.{Session, DAL}
 import scala.slick.SlickException
 
 sealed trait HasSession {
-  self: DBAction[_] =>
-
   implicit val dal: DAL
 
   protected def withSession[T](f: => T): T
@@ -16,24 +14,10 @@ sealed trait HasSession {
 
 }
 
-trait DBSession extends HasSession {
-  self: DBAction[_] =>
+sealed trait DBAction extends Invoker with HasSession {
+  self: Action[_] =>
 
-  override protected final def withSession[T](f: => T): T = {
-    dal.db.withDynSession(f) // FIXME Should be withInSession
-  }
-}
-
-trait DBTransaction extends HasSession {
-  self: DBAction[_] =>
-
-  override protected final def withSession[T](f: => T): T = {
-    dal.db.withDynTransaction(f) // FIXME Should be withInTransaction
-  }
-}
-
-abstract class DBAction[R] extends Action[R] with DBSession {
-  override protected def invoke(): Response = {
+  abstract override protected def invoke(): Result = {
     try {
       dynamicSession
       super.invoke()
@@ -41,5 +25,21 @@ abstract class DBAction[R] extends Action[R] with DBSession {
       case ex: SlickException =>
         withSession(super.invoke)
     }
+  }
+}
+
+trait DBSession extends DBAction {
+  self: Action[_] =>
+
+  protected final def withSession[T](f: => T): T = {
+    dal.db.withDynSession(f) // FIXME Should be withInSession
+  }
+}
+
+trait DBTransaction extends DBAction {
+  self: Action[_] =>
+
+  protected final def withSession[T](f: => T): T = {
+    dal.db.withDynTransaction(f) // FIXME Should be withInTransaction
   }
 }

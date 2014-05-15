@@ -39,7 +39,7 @@ object Build extends Build {
   // Root
   // -------------------------------------------------------------------------------------------------------------------
   val root = Project("qizero", file("."))
-    .aggregate(logging, config, i18n, action, persistence, service)
+    .aggregate(logging, config, i18n, action, persistence, service, testkit, all)
     .settings(basicSettings: _*)
     .settings(Publish.noPublishing: _*)
   // -------------------------------------------------------------------------------------------------------------------

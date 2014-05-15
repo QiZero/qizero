@@ -10,7 +10,7 @@ trait Cache extends Invoker {
 
   protected def cacheKey: String
 
-  abstract override protected def invoke(): Response = {
+  abstract override protected def invoke(): Result = {
     // Cache(actionKey) match {
     //   case Some(value) => value
     //   case None => super.invoke()

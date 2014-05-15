@@ -7,7 +7,7 @@ class FallbackTest extends WordSpec with Matchers {
 
   case class Echo(echo: Int) extends Action[Int] with Fallback {
     protected def act(): Int = failure("fallback")
-    protected def fallback(): Response = echo + 1
+    protected def fallback(): Result = echo + 1
   }
 
   "Fallback" should {

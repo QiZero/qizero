@@ -7,9 +7,9 @@ trait Fallback extends Invoker {
 
   final def isResponseFromFallback: Boolean = _isFallback
 
-  protected def fallback(): Response
+  protected def fallback(): Result
 
-  abstract override protected def invoke(): Response = {
+  abstract override protected def invoke(): Result = {
     try {
       _isFallback = false
       super.invoke()

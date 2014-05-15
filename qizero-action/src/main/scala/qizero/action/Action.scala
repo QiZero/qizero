@@ -5,14 +5,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait Invoker {
   _: Action[_] =>
-  type Response
-  protected def invoke(): Response
+  type Result
+  protected def invoke(): Result
 }
 
 abstract class Action[R] extends Invoker {
-  type Response = R
+  type Result = R
   protected def act(): R
-  protected def invoke(): Response = act()
+  protected def invoke(): Result = act()
 
 
   protected final def TODO = throw NotImplementedFailure

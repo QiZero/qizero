@@ -3,6 +3,7 @@ package qizero.service
 import akka.actor._
 import akka.util.Timeout
 import qizero.action.Action
+import qizero.failure.{UnhandledFailure, NotImplementedFailure}
 import qizero.message.{Reply, Message}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +19,14 @@ trait Service extends Actor {
     }
   }
 
+  protected final def TODO = {
+    sender() ! Status.Failure(NotImplementedFailure)
+  }
+
+  override def unhandled(message: Any): Unit = {
+    sender() ! Status.Failure(new UnhandledFailure(message))
+    super.unhandled(message)
+  }
 }
 
 final class ServiceRef[M <: Message](ref: ActorRef) {
