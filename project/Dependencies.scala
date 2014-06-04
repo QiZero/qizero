@@ -11,23 +11,20 @@ object Dependencies {
   private val logback = "ch.qos.logback" % "logback-classic" % "1.1.2"
 
   // Config
-  private val config = "com.typesafe" % "config" % "1.2.0"
+  private val config = "com.typesafe" % "config" % "1.2.1"
 
   // Persistence
-  private val slick = "com.typesafe.slick" %% "slick" % "2.1.0-M1" cross CrossVersion.binaryMapped{
-    case "2.11" => "2.11.0-RC4"
-    case v => v
-  }
+  private val slick = "com.typesafe.slick" %% "slick" % "2.1.0-M2"
   private val h2 = "com.h2database" % "h2" % "1.3.175"
 
   // Akka
-  private val akkaVersion = "2.3.2"
+  private val akkaVersion = "2.3.3"
   private val akka = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   private val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
   private val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion
 
   // Test
-  private val scalatest = "org.scalatest" %% "scalatest" % "2.1.4"
+  private val scalatest = "org.scalatest" %% "scalatest" % "2.1.7"
   private val mockito = "org.mockito" % "mockito-core" % "1.9.5"
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -37,9 +34,9 @@ object Dependencies {
   val loggingDeps = compile(slf4j) ++ testDeps
   val configDeps = compile(config) ++ testDeps
   val actionDeps = compile() ++ testDeps
-  val persistenceDeps = compile(jodaTime, jodaConvert, slick) ++ test(h2) ++ testDeps
-  val serviceDeps = compile(akka) ++ testDeps
-  val testkitDeps = compile(scalatest, akkaTestkit, h2)
+  val persistenceDeps = provided(slick) ++ compile(jodaTime, jodaConvert) ++ test(h2) ++ testDeps
+  val serviceDeps = provided(akka) ++ testDeps
+  val testkitDeps = optional(slick, akka) ++ compile(scalatest, akkaTestkit, h2)
 
   // -------------------------------------------------------------------------------------------------------------------
   // Utils

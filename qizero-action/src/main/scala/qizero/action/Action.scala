@@ -11,9 +11,9 @@ trait Invoker {
 
 abstract class Action[R] extends Invoker {
   type Result = R
+
   protected def act(): R
   protected def invoke(): Result = act()
-
 
   protected final def TODO = throw NotImplementedFailure
   protected final def failure(message: String) = throw new Failure(message)
@@ -28,12 +28,11 @@ object Action {
     def tell(implicit executor: ExecutionContext): Unit = ask
   }
 
-  implicit final class Mapper[R](action: Action[R]) {
-    def map[B](f: R => B): Action[B] = MapAction(action, f)
+  implicit final class MapAction[R](action: Action[R]) {
+    def map[B](f: R => B): Action[B] = new Action[B] {
+      protected def act(): B = f(action.run)
+    }
   }
 
 }
 
-case class MapAction[A, B](action: Action[A], f: A => B) extends Action[B] {
-  protected def act(): B = f(action.run)
-}

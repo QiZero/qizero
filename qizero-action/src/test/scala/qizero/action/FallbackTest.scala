@@ -6,8 +6,8 @@ import scala.util.Random
 class FallbackTest extends WordSpec with Matchers {
 
   case class Echo(echo: Int) extends Action[Int] with Fallback {
-    protected def act(): Int = failure("fallback")
-    protected def fallback(): Result = echo + 1
+    protected def act() = failure("fallback")
+    protected def fallback() = echo + 1
   }
 
   "Fallback" should {
@@ -15,7 +15,7 @@ class FallbackTest extends WordSpec with Matchers {
       val action = Echo(Random.nextInt)
       val result = action.run
       result should be(action.echo + 1)
-      action.isResponseFromFallback should be(true)
+      action.isResultFromFallback should be(true)
     }
 
   }

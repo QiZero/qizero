@@ -8,7 +8,9 @@ import qizero.persistence.mapper.Mapper
 import qizero.persistence.table.{HasId, RowId}
 import scala.slick.lifted.Query
 
-trait QueryAction {
+object QueryHelpers extends QueryHelpers
+
+trait QueryHelpers {
 
   implicit final class FindAction[E, R](q: Query[E, R, Seq])(implicit dal: DAL) {
     def find = Find(q)
@@ -35,16 +37,16 @@ trait QueryAction {
     def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
   }
 
-  implicit final class OptionMapperAction[R](action: Action[Option[R]]) {
-    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
-  }
-
-  implicit final class SeqMapperAction[R](action: Action[Seq[R]]) {
-    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
-  }
-
-  implicit final class PageMapperAction[R](action: Action[Page[R]]) {
-    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
-  }
+//  implicit final class OptionMapperAction[R](action: Action[Option[R]]) {
+//    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
+//  }
+//
+//  implicit final class SeqMapperAction[R](action: Action[Seq[R]]) {
+//    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
+//  }
+//
+//  implicit final class PageMapperAction[R](action: Action[Page[R]]) {
+//    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
+//  }
 
 }

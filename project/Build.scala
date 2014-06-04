@@ -23,7 +23,11 @@ object Build extends Build {
 
   val persistence = module("qizero-persistence")
     .dependsOn(logging, config, action)
-    .settings(libraryDependencies ++= persistenceDeps)
+    .settings(
+      libraryDependencies ++= persistenceDeps,
+      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-compiler" % _),
+      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _)
+    )
 
   val service = module("qizero-service")
     .dependsOn(action)

@@ -23,16 +23,16 @@ object DB extends Config("db") {
     jdbcDriver.getOrElse(throw new IllegalArgumentException("database.invalid_driver"))
   }
 
-  def getDB(name: String)(implicit profile: Profile): Database = {
+  def getDatabase(name: String)(implicit profile: Profile): Database = {
     val cached = Option(cachedDatabases.get(name))
     cached.getOrElse {
-      val db = createDB(name)
-      cachedDatabases.put(name, db)
+      val db = createDatabase(name)
+      cachedDatabases.putIfAbsent(name, db)
       db
     }
   }
 
-  private def createDB(name: String)(implicit profile: Profile): Database = {
+  private def createDatabase(name: String)(implicit profile: Profile): Database = {
     profile.simple.Database.forURL(
       driver = config.getString(s"$name.driver"),
       url = config.getString(s"$name.url"),

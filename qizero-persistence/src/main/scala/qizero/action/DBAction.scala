@@ -3,19 +3,16 @@ package qizero.action
 import qizero.persistence.{Session, DAL}
 import scala.slick.SlickException
 
-sealed trait HasSession {
-  implicit val dal: DAL
+sealed trait DBAction extends Invoker {
+  self: Action[_] =>
 
-  protected def withSession[T](f: => T): T
+  implicit protected val dal: DAL
 
-  implicit final def dynamicSession: Session = {
+  implicit protected final def dynamicSession: Session = {
     dal.session.dynamicSession
   }
 
-}
-
-sealed trait DBAction extends Invoker with HasSession {
-  self: Action[_] =>
+  protected def withSession[T](f: => T): T
 
   abstract override protected def invoke(): Result = {
     try {
