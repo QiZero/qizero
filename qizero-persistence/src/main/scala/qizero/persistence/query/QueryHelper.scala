@@ -2,15 +2,15 @@ package qizero.persistence.query
 
 import qizero.action.Action
 import qizero.action.db._
-import qizero.model.{Pagination, Page}
+import qizero.domain.{Page, Pagination}
 import qizero.persistence.DAL
-import qizero.persistence.mapper.Mapper
+import qizero.persistence.mapping.Mapper
 import qizero.persistence.table.{HasId, RowId}
 import scala.slick.lifted.Query
 
-object QueryHelpers extends QueryHelpers
+object QueryHelper extends QueryHelper
 
-trait QueryHelpers {
+trait QueryHelper {
 
   implicit final class FindAction[E, R](q: Query[E, R, Seq])(implicit dal: DAL) {
     def find = Find(q)
@@ -37,16 +37,18 @@ trait QueryHelpers {
     def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
   }
 
-//  implicit final class OptionMapperAction[R](action: Action[Option[R]]) {
-//    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
-//  }
-//
-//  implicit final class SeqMapperAction[R](action: Action[Seq[R]]) {
-//    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
-//  }
-//
-//  implicit final class PageMapperAction[R](action: Action[Page[R]]) {
-//    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
-//  }
+  implicit final class OptionMapperAction[R](action: Action[Option[R]]) {
+    def as[E](implicit mapper: Mapper[R, E]) = action.map(_.map(mapper))
+  }
+
+  implicit final class SeqMapperAction[R](action: Action[Seq[R]]) {
+    def as[E](implicit mapper: Mapper[R, E]) = action.map(_.map(mapper))
+  }
+
+  implicit final class PageMapperAction[R](action: Action[Page[R]]) {
+    def as[E](implicit mapper: Mapper[R, E]) = action.map { r =>
+      Page(r.content.map(mapper), r.pagination, r.total)
+    }
+  }
 
 }

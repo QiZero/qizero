@@ -7,7 +7,7 @@ import scala.slick.lifted.Query
 
 trait QueryId {
 
-  implicit final class QueryById[R, ID](query: Query[_ <: HasId[ID], R, Seq])(implicit profile: Profile) {
+  implicit final class ById[R, ID](query: Query[_ <: HasId[ID], R, Seq])(implicit profile: Profile) {
     def byId(id: ID)(implicit m: BaseTypedType[ID]) = {
       import profile.simple._
       query.filter(_.id === id)
@@ -21,7 +21,7 @@ trait QueryId {
     }
 
     def returningId(f: (R, ID) => R): Profile#IntoInsertInvokerDef[R, R] = {
-      returningId.into(f)
+      returningId().into(f)
     }
   }
 

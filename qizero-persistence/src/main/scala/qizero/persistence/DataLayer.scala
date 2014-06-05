@@ -8,15 +8,13 @@ trait HasDB {
   val db: Database
 }
 
-trait Schema extends HasProfile with HasDB {
-  def name: String
-  implicit val profile: Profile = DB.getProfile(name)
-  implicit val db: Database = DB.getDatabase(name)
+class DAL(val name: String) extends HasProfile with HasDB {
+  implicit val _dal: this.type = this
+  val profile: Profile = DB.getProfile(name)
+  val db: Database = DB.getDatabase(name)(profile)
 
   object session {
     def dynamicSession: Session = profile.simple.Database.dynamicSession
   }
 
 }
-
-class DAL(val name: String) extends Schema

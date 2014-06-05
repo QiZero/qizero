@@ -1,7 +1,7 @@
 package qizero.action.db
 
 import qizero.action.{DBSession, Action}
-import qizero.model.{Page, Pagination}
+import qizero.domain.{Page, Pagination}
 import qizero.persistence.DAL
 import scala.slick.lifted.Query
 

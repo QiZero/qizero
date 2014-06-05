@@ -33,4 +33,6 @@ object ServiceRef {
 
   def apply[M <: Message](actorRef: ActorRef) = new ServiceRef[M](actorRef)
 
+  implicit def toRef[M <:Message](actorRef:ActorRef) = new ServiceRef[M](actorRef)
+
 }

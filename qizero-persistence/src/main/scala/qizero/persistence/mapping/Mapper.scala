@@ -1,26 +1,27 @@
-package qizero.persistence.mapper
+package qizero.persistence.mapping
 
 import language.experimental.macros
-import qizero.model.Page
 import scala.reflect.macros.whitebox.Context
 
 trait Mapper[R, E] extends (R => E)
 
 object Mapper {
-
-  implicit final class OptionMapper[R, E](mapper: Mapper[R, E]) extends Mapper[Option[R], Option[E]] {
-    def apply(r: Option[R]): Option[E] = r.map(mapper)
+  def apply[R, E](mapper: R => E) = new Mapper[R, E] {
+    def apply(r: R): E = mapper(r)
   }
+  //  class OptionMapper[R, E](mapper: Mapper[R, E]) extends Mapper[Option[R], Option[E]] {
+  //    def apply(r: Option[R]): Option[E] = r.map(mapper)
+  //  }
+  //
+  //  class SeqMapper[R, E](mapper: Mapper[R, E]) extends Mapper[Seq[R], Seq[E]] {
+  //    def apply(r: Seq[R]): Seq[E] = r.map(mapper)
+  //  }
+  //
+  //  class PageMapper[R, E](mapper: Mapper[R, E]) extends Mapper[Page[R], Page[E]] {
+  //    def apply(r: Page[R]): Page[E] = Page(r.content.map(mapper), r.pagination, r.total)
+  //  }
 
-  implicit final class SeqMapper[R, E](mapper: Mapper[R, E]) extends Mapper[Seq[R], Seq[E]] {
-    def apply(r: Seq[R]): Seq[E] = r.map(mapper)
-  }
-
-  implicit final class PageMapper[R, E](mapper: Mapper[R, E]) extends Mapper[Page[R], Page[E]] {
-    def apply(r: Page[R]): Page[E] = Page(r.content.map(mapper), r.pagination, r.total)
-  }
-
-  implicit def create[R, E]: Mapper[R, E] = macro MapperMacro.create[R, E]
+  //  implicit def create[R, E]: Mapper[R, E] = macro MapperMacro.create[R, E]
 
 }
 

@@ -1,11 +1,10 @@
-package qizero.persistence.mapper
+package qizero.persistence.mapping
 
 import java.sql.Timestamp
 import org.joda.time.DateTime
 import qizero.persistence.HasProfile
 
-trait DateMapper {
-  _: HasProfile =>
+trait DateMapper extends HasProfile {
 
   import profile.simple._
 

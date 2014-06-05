@@ -1,4 +1,4 @@
-package qizero.model
+package qizero.domain
 
 final case class Page[+T](content: Seq[T], pagination: Pagination, total: Int) {
   require(total >= 0, "Total must not be less than zero!")

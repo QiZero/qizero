@@ -1,4 +1,4 @@
-package qizero.persistence.mapper
+package qizero.persistence.mapping
 
 import org.scalatest.{Matchers, WordSpec}
 

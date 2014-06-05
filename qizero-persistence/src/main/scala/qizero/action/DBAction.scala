@@ -1,12 +1,12 @@
 package qizero.action
 
 import qizero.persistence.{Session, DAL}
-import scala.slick.SlickException
+import scala.util.{Success, Failure, Try}
 
 sealed trait DBAction extends Invoker {
   self: Action[_] =>
 
-  implicit protected val dal: DAL
+  val dal: DAL
 
   implicit protected final def dynamicSession: Session = {
     dal.session.dynamicSession
@@ -14,15 +14,10 @@ sealed trait DBAction extends Invoker {
 
   protected def withSession[T](f: => T): T
 
-  abstract override protected def invoke(): Result = {
-    try {
-      dynamicSession
-      super.invoke()
-    } catch {
-      case ex: SlickException =>
-        withSession(super.invoke)
-    }
-  }
+// FIXME if use withIn then can remove the try to get dynamicSession
+//  abstract override protected def invoke(): Result = {
+//    withSession(super.invoke())
+//  }
 }
 
 trait DBSession extends DBAction {
@@ -31,6 +26,13 @@ trait DBSession extends DBAction {
   protected final def withSession[T](f: => T): T = {
     dal.db.withDynSession(f) // FIXME Should be withInSession
   }
+
+  abstract override protected def invoke(): Result = {
+    Try(dynamicSession) match {
+      case Success(s) => super.invoke()
+      case Failure(ex) => withSession(super.invoke())
+    }
+  }
 }
 
 trait DBTransaction extends DBAction {
@@ -38,5 +40,12 @@ trait DBTransaction extends DBAction {
 
   protected final def withSession[T](f: => T): T = {
     dal.db.withDynTransaction(f) // FIXME Should be withInTransaction
+  }
+
+  abstract override protected def invoke(): Result = {
+    Try(dynamicSession) match {
+      case Success(s) => s.withTransaction(super.invoke())
+      case Failure(ex) => withSession(super.invoke())
+    }
   }
 }

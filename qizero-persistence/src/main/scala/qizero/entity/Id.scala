@@ -19,5 +19,5 @@ trait TypedIdOrdering[I <: TypedId] {
 }
 
 trait TypedIdCompanion[I <: TypedId] extends TypedIdFactory[I] with TypedIdOrdering[I] {
-  implicit final def long2Id(value: Long): I = apply(value)
+  implicit def toId(value: Long): I = apply(value)
 }
