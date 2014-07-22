@@ -2,6 +2,7 @@ package qizero.action
 
 import qizero.failure.{NotImplementedFailure, Failure}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.global
 
 trait Invoker {
   _: Action[_] =>
@@ -24,8 +25,9 @@ object Action {
 
   implicit final class Runner[+R](action: Action[R]) {
     def run: R = action.invoke()
-    def ask(implicit executor: ExecutionContext): Future[R] = Future(run)
-    def tell(implicit executor: ExecutionContext): Unit = ask
+    def async(implicit executor: ExecutionContext = global): Future[R] = Future(run)
+    def ask(implicit executor: ExecutionContext = global): Future[R] = Future(run)
+    def tell(implicit executor: ExecutionContext = global): Unit = ask
   }
 
   implicit final class MapAction[R](action: Action[R]) {

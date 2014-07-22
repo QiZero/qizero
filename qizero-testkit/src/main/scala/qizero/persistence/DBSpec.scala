@@ -1,27 +1,30 @@
 package qizero.persistence
 
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import scala.util.Try
+import org.scalatest.{Suite, SuiteMixin}
 
-abstract class DBSpec[D <: DAL](_dal: D) extends DBSpecLike {
-  implicit val dal = _dal
-}
+trait DBSpec extends SuiteMixin {
+  this: Suite =>
 
-trait DBSpecLike extends WordSpecLike with Matchers with BeforeAndAfterAll {
-
-  implicit val dal: DAL
+  val dal: DAL
 
   import dal.profile.simple._
 
-  def tables: Seq[TableQuery[_ <: Table[_]]]
-
-  override protected def beforeAll(): Unit = {
-    dal.db.withSession { implicit s =>
-      tables.foreach { t =>
-        val ddl = dal.profile.buildTableSchemaDescription(t.baseTableRow)
-        Try(ddl.create)
-      }
-    }
+  implicit protected final def dynamicSession = {
+    dal.session.dynamicSession
   }
 
+  def ddl: dal.profile.DDL
+
+  protected def withDBFixture() = {
+    ddl.create
+  }
+
+  abstract override def withFixture(test: NoArgTest) = {
+    dal.db.withDynTransaction {
+      withDBFixture()
+      val outcome = super.withFixture(test)
+      dynamicSession.rollback()
+      outcome
+    }
+  }
 }

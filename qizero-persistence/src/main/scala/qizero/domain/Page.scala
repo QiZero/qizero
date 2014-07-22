@@ -31,6 +31,8 @@ final case class Page[+T](content: Seq[T], pagination: Pagination, total: Int) {
 
   def length: Int = content.length
 
+  def map[B](f: T => B): Page[B] = new Page(content.map(f), pagination, total)
+
 }
 
 final case class Pagination(pageNumber: Int, pageSize: Int) {

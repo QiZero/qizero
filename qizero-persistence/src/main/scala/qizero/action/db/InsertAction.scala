@@ -2,7 +2,7 @@ package qizero.action.db
 
 import qizero.action.{DBSession, Action}
 import qizero.persistence.DAL
-import qizero.persistence.query.QueryId
+import qizero.persistence.query.IdQuery
 import qizero.persistence.table.{RowId, HasId}
 import scala.slick.lifted.Query
 
@@ -24,7 +24,7 @@ final case class Insert[R](query: Query[_, R, Seq], row: R)
 
 final case class InsertReturningId[R <: RowId[ID], ID](private val q: Query[_ <: HasId[ID], R, Seq], row: R)
                                                       (implicit val dal: DAL)
-  extends Action[R] with DBSession with QueryId{
+  extends Action[R] with DBSession with IdQuery{
 
   private val query = ReturningId(q)(dal.profile).returningId(copyId)
 

@@ -8,6 +8,8 @@ trait HasDB {
   val db: Database
 }
 
+abstract class HasDAL[D <: DAL](val dal: D)
+
 class DAL(val name: String) extends HasProfile with HasDB {
   implicit val _dal: this.type = this
   val profile: Profile = DB.getProfile(name)

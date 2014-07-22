@@ -5,7 +5,7 @@ import qizero.persistence.table.HasId
 import scala.slick.ast.BaseTypedType
 import scala.slick.lifted.Query
 
-trait QueryId {
+trait IdQuery {
 
   implicit final class ById[R, ID](query: Query[_ <: HasId[ID], R, Seq])(implicit profile: Profile) {
     def byId(id: ID)(implicit m: BaseTypedType[ID]) = {
