@@ -1,8 +1,8 @@
 package qizero.persistence
 
 import java.util.concurrent.ConcurrentHashMap
-import qizero.config.Config
 import scala.slick.driver._
+import qizero.config.Config
 
 object DB extends Config("db") {
 
@@ -36,8 +36,8 @@ object DB extends Config("db") {
     profile.simple.Database.forURL(
       driver = config.getString(s"$name.driver"),
       url = config.getString(s"$name.url"),
-      user = config.getString(s"$name.user"),
-      password = config.getString(s"$name.password")
+      user = config.getStringOption(s"$name.user").orNull,
+      password = config.getStringOption(s"$name.password").orNull
     )
   }
 }

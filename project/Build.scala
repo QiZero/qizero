@@ -9,6 +9,13 @@ object Build extends Build {
   // -------------------------------------------------------------------------------------------------------------------
   // Modules
   // -------------------------------------------------------------------------------------------------------------------
+  val annotation = module("qizero-annotation")
+    .settings(
+      paradise,
+      libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-reflect" % _),
+      libraryDependencies ++= annotationDeps
+    )
+
   val logging = module("qizero-logging")
     .settings(libraryDependencies ++= loggingDeps)
 
@@ -24,15 +31,16 @@ object Build extends Build {
   val persistence = module("qizero-persistence")
     .dependsOn(logging, config, action)
     .settings(
-      libraryDependencies ++= persistenceDeps
+      libraryDependencies ++= persistenceDeps,
+      libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-reflect" % _)
     )
 
-//  val persistenceMapper = module("qizero-persistence-mapper")
-//    .settings(
-//      libraryDependencies ++= persistenceDeps,
-//      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
-//      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-compiler" % _)
-//    )
+  //  val persistenceMapper = module("qizero-persistence-mapper")
+  //    .settings(
+  //      libraryDependencies ++= persistenceDeps,
+  //      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
+  //      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-compiler" % _)
+  //    )
 
   val service = module("qizero-service")
     .dependsOn(action)
@@ -48,8 +56,8 @@ object Build extends Build {
   // Root
   // -------------------------------------------------------------------------------------------------------------------
   val root = Project("qizero", file("."))
-    .aggregate(logging, config, i18n, action, persistence, service, testkit, all)
-    .settings(basicSettings: _*)
+    .aggregate(annotation, logging, config, i18n, action, persistence, service, testkit, all)
+    .settings(Basic.settings: _*)
     .settings(Publish.noPublishing: _*)
   // -------------------------------------------------------------------------------------------------------------------
   // Utils
@@ -57,6 +65,6 @@ object Build extends Build {
   override val settings = super.settings ++ Seq(
     shellPrompt := (s => "[" + Project.extract(s).currentProject.id + "] $ ")
   )
-  private def base(project: Project) = project.settings(basicSettings: _*)
+  private def base(project: Project) = project.settings(Basic.settings: _*)
   private def module(name: String, path: String = ".") = base(Project(id = name, base = file(s"$path/$name")))
 }
