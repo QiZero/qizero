@@ -18,7 +18,8 @@ object BuildSettings {
       javacOptions ++= Seq(
         "-source", "1.7",
         "-target", "1.7"
-      )
+      ),
+      shellPrompt := (s => "[" + Project.extract(s).currentProject.id + "] $ ")
     ) ++ Publish.settings ++ Release.settings
   }
 
