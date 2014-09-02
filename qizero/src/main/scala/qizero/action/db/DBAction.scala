@@ -3,7 +3,7 @@ package qizero.action.db
 import scala.language.higherKinds
 import scala.slick.lifted.{RunnableCompiled, Query}
 import qizero.action.{Action, DBSession}
-import qizero.persistence.mapping.Mapper
+import qizero.entity.Mapper
 
 trait DBAction[R] extends Action[R] {
   def statement: String

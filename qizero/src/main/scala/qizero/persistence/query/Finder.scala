@@ -3,9 +3,9 @@ package qizero.persistence.query
 import scala.language.higherKinds
 import scala.slick.lifted.{Query, RunnableCompiled}
 import qizero.action.db._
+import qizero.entity.Mapper
 import qizero.model._
 import qizero.persistence.DAL
-import qizero.persistence.mapping.Mapper
 
 trait Finder[R] {
   def first: DBAction[R]

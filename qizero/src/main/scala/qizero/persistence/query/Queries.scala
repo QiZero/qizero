@@ -4,9 +4,8 @@ import scala.language.{existentials, higherKinds, implicitConversions}
 import scala.slick.ast.BaseTypedType
 import scala.slick.lifted._
 import qizero.action.db._
-import qizero.persistence.mapping.Mapper
-import qizero.persistence.table._
-import qizero.persistence.{DAL, Profile}
+import qizero.entity.Mapper
+import qizero.persistence._
 
 trait Queries
   extends IdQueries

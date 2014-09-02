@@ -1,10 +1,12 @@
-package qizero.persistence.mapping
+package qizero.entity
 
+import scala.annotation.implicitNotFound
 import scala.collection.Traversable
 import scala.language.experimental.macros
 import scala.language.implicitConversions
 import qizero.model._
 
+@implicitNotFound("No implicit Mapper defined for ${IN} -> ${OUT}.")
 trait Mapper[IN, OUT] extends (IN => OUT)
 
 object Mapper extends DefaultMapper {

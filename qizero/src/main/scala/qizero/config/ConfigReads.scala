@@ -7,14 +7,12 @@ import scala.concurrent.duration._
 import scala.language.higherKinds
 import com.typesafe.config.{Config, ConfigUtil}
 
-@implicitNotFound("No implicit ValueReader defined for ${T}.")
+@implicitNotFound("No implicit ConfigReads defined for ${T}.")
 trait ConfigReads[T] {
   def read(config: Config, path: String): T
 }
 
 object ConfigReads extends DefaultConfigReads {
-
-  def as[T]: ConfigReads[T] = ??? // TODO Create Macro
 
   def apply[T](f: (Config, String) => T) = new ConfigReads[T] {
     def read(config: Config, path: String): T = f(config, path)

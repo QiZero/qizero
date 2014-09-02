@@ -1,7 +1,7 @@
 package qizero.persistence.query
 
 import org.scalatest.FunSuite
-import qizero.persistence.mapping.Mapper
+import qizero.entity.Mapper
 import qizero.persistence.{DBSpec, TestDAL}
 
 class QueriesTest extends FunSuite with DBSpec {

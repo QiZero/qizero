@@ -97,7 +97,7 @@ class JsonMacros(val c: Context) {
           // More than one field, use Play's macro
           q"play.api.libs.json.Json.format[$className]"
       }
-      q"implicit lazy val toJsonFormat = $body"
+      q"implicit lazy val JsonFormat = $body"
     }
 
     def modifiedCompanion(compDefOpt: Option[ModuleDef], format: ValDef, className: TypeName) = {

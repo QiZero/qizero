@@ -1,7 +1,7 @@
 package qizero
 
-import scala.slick.driver.{JdbcDriver, JdbcProfile}
-import scala.slick.jdbc.JdbcBackend
+import slick.driver.{JdbcDriver, JdbcProfile}
+import slick.jdbc.JdbcBackend
 
 package object persistence {
   type Session = JdbcBackend#Session

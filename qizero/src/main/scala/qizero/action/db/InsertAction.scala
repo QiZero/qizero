@@ -1,9 +1,8 @@
 package qizero.action.db
 
 import scala.slick.lifted.Query
-import qizero.persistence.DAL
 import qizero.persistence.query.IdQueries
-import qizero.persistence.table.{HasId, RowId}
+import qizero.persistence._
 
 trait InsertAction[R] extends QueriedAction[R]{
   self: DBAction[_] =>

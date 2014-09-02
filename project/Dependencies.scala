@@ -26,7 +26,7 @@ object Dependencies {
   val playJson = "com.typesafe.play" %% "play-json" % playVersion
 
   // Akka
-  val akkaVersion = "2.3.4"
+  val akkaVersion = "2.3.5"
   val akka = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion
@@ -34,18 +34,6 @@ object Dependencies {
   // Test
   val scalatest = "org.scalatest" %% "scalatest" % "2.2.1"
   val mockito = "org.mockito" % "mockito-core" % "1.9.5"
-
-  // -------------------------------------------------------------------------------------------------------------------
-  // Module Dependecies
-  // -------------------------------------------------------------------------------------------------------------------
-//  val testDeps = test(scalatest, mockito)
-//  val jsonDeps = compile(playJson) ++ testDeps
-//  val loggingDeps = compile(slf4j) ++ testDeps
-//  val configDeps = compile(config) ++ testDeps
-//  val actionDeps = compile() ++ testDeps
-//  val persistenceDeps = provided(slick, playJson) ++ compile(jodaTime, jodaConvert) ++ test(h2) ++ testDeps
-//  val serviceDeps = provided(akka) ++ testDeps
-//  val testkitDeps = optional(slick, akka) ++ compile(scalatest, akkaTestkit, h2)
 
   // -------------------------------------------------------------------------------------------------------------------
   // Utils

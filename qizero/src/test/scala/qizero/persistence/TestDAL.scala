@@ -3,7 +3,7 @@ package qizero.persistence
 import query.Queries
 
 object TestDAL
-  extends DAL("test")
+  extends NamedDAL("test")
   with Tables
   with Queries
 

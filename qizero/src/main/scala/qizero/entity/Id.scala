@@ -1,6 +1,7 @@
 package qizero.entity
 
 
+import scala.annotation.implicitNotFound
 import scala.language.experimental.macros
 import scala.language.implicitConversions
 import scala.reflect.macros.whitebox.Context
@@ -11,7 +12,7 @@ trait TypedId extends Any with MappedTo[Long] {
 }
 
 object TypedId {
-
+  @implicitNotFound("No implicit Factory defined for ${I}.")
   trait Factory[I <: TypedId] extends (Long => I)
 
   object Factory {
@@ -24,7 +25,6 @@ object TypedId {
 }
 
 object TypedIdMacro {
-
   def materializeFactory[T <: TypedId : c.WeakTypeTag](c: Context): c.Tree = {
     import c.universe._
 
@@ -43,14 +43,4 @@ object TypedIdMacro {
       case l => c.abort(NoPosition, s"There are ${l.size} implicit candidates found. There should be only 1.")
     }
   }
-
 }
-
-trait TypedIdOrdering[I <: TypedId] {
-
-  implicit object ordering extends Ordering[I] {
-    def compare(a: I, b: I): Int = a.value compare b.value
-  }
-
-}
-

@@ -2,9 +2,26 @@ package qizero.persistence
 
 import org.scalatest.{Matchers, WordSpec}
 
+object DBTestDAL extends NamedDAL("test") {
+
+  import profile.simple._
+
+  case class Foo(name:String, count:Int)
+
+  class Foos(tag:Tag) extends Table[Foo](tag, "foo") {
+
+    val name = column[String]("name")
+    val count = column[Int]("count")
+
+    def * = (name, count) <> (Foo.tupled, Foo.unapply)
+  }
+
+  lazy val Foos = TableQuery[Foos]
+}
+
 class DBSpecTest extends WordSpec with Matchers with DBSpec {
 
-  val dal = TestDAL
+  val dal = DBTestDAL
   import dal._
   import profile.simple._
 
@@ -23,21 +40,4 @@ class DBSpecTest extends WordSpec with Matchers with DBSpec {
       Foos.insert(Foo("a", 1))
     }
   }
-}
-
-object TestDAL extends DAL("test") {
-
-  import profile.simple._
-
-  case class Foo(name:String, count:Int)
-
-  class Foos(tag:Tag) extends Table[Foo](tag, "foo") {
-
-    val name = column[String]("name")
-    val count = column[Int]("count")
-
-    def * = (name, count) <> (Foo.tupled, Foo.unapply)
-  }
-
-  lazy val Foos = TableQuery[Foos]
 }
