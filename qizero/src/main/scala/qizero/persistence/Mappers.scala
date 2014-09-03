@@ -16,7 +16,7 @@ trait DateMapper {
 
 }
 
-trait EnumMapper {
+trait EnumerationMapper {
   self: HasProfile =>
 
   import profile.simple._

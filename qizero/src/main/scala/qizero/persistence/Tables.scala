@@ -16,7 +16,6 @@ trait HasCreatedAt {
 }
 
 trait RowId[ID] {
-  val id:ID
   def withId(id: ID): RowId[ID]
 }
 
