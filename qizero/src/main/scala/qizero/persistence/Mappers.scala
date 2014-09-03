@@ -1,8 +1,8 @@
 package qizero.persistence
 
-import java.sql.Timestamp
+import java.sql._
 import scala.util.Try
-import org.joda.time.DateTime
+import org.joda.time._
 
 trait DateMapper {
   self: HasProfile =>
@@ -14,6 +14,10 @@ trait DateMapper {
     timestamp => new DateTime(timestamp.getTime)
   )
 
+  implicit val localDateMapper = MappedColumnType.base[LocalDate, Date](
+    dt => new Date(dt.toDate.getTime),
+    d => new LocalDate(d.getTime)
+  )
 }
 
 trait EnumerationMapper {

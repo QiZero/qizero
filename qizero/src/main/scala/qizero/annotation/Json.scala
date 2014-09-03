@@ -4,13 +4,17 @@ import scala.annotation.StaticAnnotation
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
-class json extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro JsonMacro.impl
+final class json extends StaticAnnotation {
+  def macroTransform(annottees: Any*): Any = macro JsonMacro.fromAnnotation
 }
+
+//final class jsonNamed(name: String) extends StaticAnnotation
+
+//final class jsonIgnored extends StaticAnnotation
 
 object JsonMacro {
 
-  def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
+  def fromAnnotation(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
     import c.universe._
 
     def modifiedDeclaration(classDef: ClassDef, compDefOpt: Option[ModuleDef] = None) = {
@@ -20,9 +24,9 @@ object JsonMacro {
 
       // Return both the class and companion object declarations
       c.Expr( q"""
-        $classDef
-        $compDef
-      """)
+          $classDef
+          $compDef
+        """)
     }
 
     def extractClassNameAndFields(classDef: ClassDef) = {
@@ -40,17 +44,17 @@ object JsonMacro {
         case 1 =>
           // Only one field, use the serializer for the field
           q"""{
-              import play.api.libs.json._
-              Format(
-                __.read[${fields.head.tpt}].map(s => ${className.toTermName}(s)),
-                new Writes[$className] { def writes(o: $className) = Json.toJson(o.${fields.head.name}) }
-              )
-            }"""
+                import play.api.libs.json._
+                Format(
+                  __.read[${fields.head.tpt}].map(s => ${className.toTermName}(s)),
+                  new Writes[$className] { def writes(o: $className) = Json.toJson(o.${fields.head.name}) }
+                )
+              }"""
         case _ =>
           // More than one field, use Play's macro
           q"play.api.libs.json.Json.format[$className]"
       }
-      q"implicit lazy val toJsonFormat = $body"
+      q"implicit lazy val JsonFormat = $body"
     }
 
     def modifiedCompanion(compDefOpt: Option[ModuleDef], format: ValDef, className: TypeName) = {
@@ -58,11 +62,11 @@ object JsonMacro {
         // Add the formatter to the existing companion object
         val q"object $obj extends ..$bases { ..$body }" = compDef
         q"""
-          object $obj extends ..$bases {
-            ..$body
-            $format
-          }
-        """
+            object $obj extends ..$bases {
+              ..$body
+              $format
+            }
+          """
       } getOrElse {
         // Create a companion object with the formatter
         q"object ${className.toTermName} { $format }"
@@ -74,5 +78,6 @@ object JsonMacro {
       case _ => c.abort(c.enclosingPosition, "Invalid annottee")
     }
   }
+
 
 }

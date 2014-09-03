@@ -59,11 +59,13 @@ object Slice {
   implicit def SliceWrites[T: Writes] = Writes { p: Slice[T] =>
     Json.obj(
       "data" -> p.content,
-      "count" -> p.count,
-      "pageNumber" -> p.number,
-      "pageSize" -> p.size,
-      "hasNext" -> p.hasNext,
-      "hasPrevious" -> p.hasPrevious
+      "page" -> Json.obj(
+        "number" -> p.number,
+        "size" -> p.size,
+        "count" -> p.count,
+        "hasNext" -> p.hasNext,
+        "hasPrevious" -> p.hasPrevious
+      )
     )
   }
 
@@ -89,12 +91,14 @@ object Page {
   implicit def PageWrites[T: Writes] = Writes { p: Page[T] =>
     Json.obj(
       "data" -> p.content,
-      "count" -> p.count,
-      "pageNumber" -> p.number,
-      "pageSize" -> p.size,
-      "total" -> p.total,
-      "hasNext" -> p.hasNext,
-      "hasPrevious" -> p.hasPrevious
+      "page" -> Json.obj(
+        "number" -> p.number,
+        "size" -> p.size,
+        "count" -> p.count,
+        "total" -> p.total,
+        "hasNext" -> p.hasNext,
+        "hasPrevious" -> p.hasPrevious
+      )
     )
   }
 }

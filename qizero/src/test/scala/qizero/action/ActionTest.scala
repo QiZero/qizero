@@ -24,7 +24,7 @@ class ActionTest extends WordSpec with Matchers with ScalaFutures {
 
     "execute async" in {
       val action = Echo(Random.nextInt)
-      val asyncResult = action.future
+      val asyncResult = action.async
       whenReady(asyncResult) { r =>
         r should be(action.echo)
       }
