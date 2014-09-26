@@ -80,7 +80,7 @@ final class Page[T](
 
   lazy val totalPages: Int = Math.ceil(total / size).toInt
 
-  lazy val hasNext: Boolean = number + 1 < totalPages
+  lazy val hasNext: Boolean = number < totalPages
 
   def map[B](f: T => B): Page[B] = new Page(content.map(f), pagination, total)
 

@@ -1,5 +1,6 @@
 package qizero.persistence
 
+import scala.util.Try
 import org.scalatest.{Suite, SuiteMixin}
 
 trait DBSpec extends SuiteMixin {
@@ -15,7 +16,7 @@ trait DBSpec extends SuiteMixin {
 
   protected def withDBFixture() = {
     import dal.profile.simple._
-    ddl.create
+    Try(ddl.create)
   }
 
   abstract override def withFixture(test: NoArgTest) = {

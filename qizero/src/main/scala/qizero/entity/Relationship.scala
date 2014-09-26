@@ -56,10 +56,10 @@ object HasMany {
   def apply[E <: Entity](ids: Seq[E#ID]) = HasIds[E](ids)
   def apply[E <: Entity](entities: Seq[E]) = HasEntities[E](entities)
 
-  def empty = HasNone
+  val empty = HasEmpty
 }
 
-object HasNone extends HasMany[Nothing] {
+object HasEmpty extends HasMany[Nothing] {
   val ids = Seq.empty
   val entities = Seq.empty
   val isEntities = true

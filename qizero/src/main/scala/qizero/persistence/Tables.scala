@@ -15,12 +15,12 @@ trait HasCreatedAt {
   def createdAt: Column[DateTime]
 }
 
-trait RowId[ID] {
-  def withId(id: ID): RowId[ID]
-}
-
 trait HasId[ID] {
   _: AbstractTable[_] =>
 
   def id: Column[ID]
+}
+
+trait RowId[ID] {
+  def withId(id: ID): RowId[ID]
 }

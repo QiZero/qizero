@@ -16,7 +16,8 @@ trait Finder[R] {
   def count: DBAction[Int]
   def exists: DBAction[Boolean]
 
-  def as[E](implicit mapper: Mapper[R, E]): Finder[E] = new MappedFinder[R, E](this, mapper)
+  def as[T](implicit mapper: Mapper[R, T]): Finder[T] = new MappedFinder[R, T](this, mapper)
+  def map[T](f: R => T): Finder[T] = as(Mapper(f))
 }
 
 private final class QueriedFinder[R](query: Query[_, R, Seq])(implicit dal: DAL) extends Finder[R] {

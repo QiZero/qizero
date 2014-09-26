@@ -25,12 +25,12 @@ trait EnumerationMapper {
 
   import profile.simple._
 
-  protected final def stringEnumMapper(enum: Enumeration) = MappedColumnType.base[enum.Value, String](
+  protected final def enumStringMapper(enum: Enumeration) = MappedColumnType.base[enum.Value, String](
     e => e.toString,
     s => Try(enum.withName(s)).getOrElse(throw new IllegalArgumentException(s"enumeration $s doesn't exist $enum [${enum.values.mkString(",")}]"))
   )
 
-  protected final def intEnumMapper(enum: Enumeration) = MappedColumnType.base[enum.Value, Int](
+  protected final def enumIntMapper(enum: Enumeration) = MappedColumnType.base[enum.Value, Int](
     e => e.id,
     i => enum.apply(i)
   )

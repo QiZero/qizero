@@ -14,7 +14,7 @@ sealed trait DBInvoker extends Invoker {
 
   protected def withSession[T](f: => T): T
 
-  // FIXME if use withIn then can remove the try to get dynamicSession
+  // FIXME try to use withIn then can remove the try to get dynamicSession
   //  abstract override protected def invoke(): Result = {
   //    withSession(super.invoke())
   //  }

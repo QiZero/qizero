@@ -39,8 +39,8 @@ trait InsertQueries {
 
 trait MapQueries {
 
-  implicit final class ToMap[R](action: DBAction[R]) {
-    def as[E](implicit mapper: Mapper[R, E]) = action.map(mapper)
+  implicit final class Map[R](action: DBAction[R]) {
+    def as[E](implicit mapper: Mapper[R, E]): DBAction[E] = new MapDBAction(action, mapper)
   }
 
 }

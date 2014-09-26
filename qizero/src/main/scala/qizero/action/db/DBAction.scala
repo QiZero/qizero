@@ -1,9 +1,8 @@
 package qizero.action.db
 
 import scala.language.higherKinds
-import scala.slick.lifted.{RunnableCompiled, Query}
+import scala.slick.lifted.{Query, RunnableCompiled}
 import qizero.action.{Action, DBSession}
-import qizero.entity.Mapper
 
 trait DBAction[R] extends Action[R] {
   def statement: String
@@ -21,7 +20,7 @@ trait CompiledAction[R, C[_]] extends DBSession {
   def compiled: RunnableCompiled[_ <: Query[_, R, C], C[R]]
 }
 
-class MapDBAction[IN, OUT](action: DBAction[IN], mapper: Mapper[IN, OUT]) extends DBAction[OUT] {
+final class MapDBAction[IN, OUT](action: DBAction[IN], mapper: IN => OUT) extends DBAction[OUT] {
   def statement: String = action.statement
   protected def act(): OUT = mapper(action.run)
 }
