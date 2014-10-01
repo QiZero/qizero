@@ -32,7 +32,7 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
       result shouldBe 'defined
     }
     "find list" in new WithData {
-      val result = Foos.find.list.run
+      val result = Foos.find.all.run
       result should have size (10)
     }
     "count" in new WithData {
@@ -54,7 +54,7 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
       result shouldBe 'defined
     }
     "find list" in new WithData {
-      val result = Foos.find.as[Foo].list.run
+      val result = Foos.find.as[Foo].all.run
       result should have size (10)
     }
   }
