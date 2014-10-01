@@ -34,7 +34,7 @@ trait Timestamp extends CreatedAt with UpdatedAt {
   _: Entity =>
 }
 
-object EntityMacros {
+private object EntityMacros {
   def materialize[IN: c.WeakTypeTag, OUT: c.WeakTypeTag](c: Context) = {
     import c.universe._
 
@@ -42,18 +42,18 @@ object EntityMacros {
     val outType = weakTypeOf[OUT]
 
     val inConstructor = inType.decl(termNames.CONSTRUCTOR) match {
-      case NoSymbol => c.abort(c.enclosingPosition, "No in constructor found")
+      case NoSymbol => c.abort(c.enclosingPosition, "IN constructor not found")
       case s => s.asMethod
     }
     val inParams = inConstructor.paramLists.head
 
     val outConstructor = outType.decl(termNames.CONSTRUCTOR) match {
-      case NoSymbol => c.abort(c.enclosingPosition, "No out constructor found")
+      case NoSymbol => c.abort(c.enclosingPosition, "OUT constructor not found")
       case s => s.asMethod
     }
     val outParams = outConstructor.paramLists.head
 
-    def getParams() = outParams.map { param =>
+    def getParams() = outParams.flatMap { param =>
       val paramName = param.name.toTermName
       val paramType = param.typeSignature
       if (paramType <:< typeOf[Has[_]]) {
@@ -62,8 +62,8 @@ object EntityMacros {
         inIdParamOpt match {
           case Some(idParam) =>
             val idParamName = idParam.name.toTermName
-            q"$paramName = new _root_.qizero.entity.HasId[$entityType](in.$idParamName)"
-          case None => c.abort(c.enclosingPosition, "Missing param " + paramName)
+            Some(q"$paramName = new _root_.qizero.entity.HasId[$entityType](in.$idParamName)")
+          case None => c.abort(c.enclosingPosition, "Missing Param Id:" + paramName)
         }
       } else {
         val inParamOpt = inParams.find(_.name == paramName)
@@ -71,10 +71,11 @@ object EntityMacros {
           case Some(inParam) =>
             val inParamName = inParam.name.toTermName
             val inParamType = inParam.typeSignature
-            if (paramType =:= inParamType) q"$paramName = in.$inParamName"
-            else if (inParamType <:< typeOf[Option[_]] && inParamType.typeArgs(0) =:= paramType) q"$paramName = in.$inParamName.get"
-            else c.abort(c.enclosingPosition, "Missing param " + paramName)
-          case None => c.abort(c.enclosingPosition, "Missing param " + paramName)
+            if (paramType =:= inParamType) Some(q"$paramName = in.$inParamName")
+            else if (inParamType <:< typeOf[Option[_]] && inParamType.typeArgs(0) =:= paramType) Some(q"$paramName = in.$inParamName.get")
+            else c.abort(c.enclosingPosition, "Param Type doesn't matched: " + paramName)
+          case None if param.asTerm.isParamWithDefault => None
+          case None => c.abort(c.enclosingPosition, "Missing Param: " + paramName)
         }
       }
     }

@@ -14,7 +14,7 @@ class EntityTest extends WordSpec with Matchers {
 
   case class BarId(value: Long) extends TypedId
 
-  case class Bar(name: String, foo: Has[Foo], id: BarId) extends Entity with Id[BarId]
+  case class Bar(name: String, email:Option[String] = None, foo: Has[Foo], id: BarId) extends Entity with Id[BarId]
 
   case class BarRow(name: String, fooId: FooId, id: Option[BarId])
 
@@ -48,7 +48,7 @@ class EntityTest extends WordSpec with Matchers {
 
     "create a mapper with Has" in {
       val mapper = Entity.mapper { in: BarRow =>
-        Bar(in.name, Has[Foo](in.fooId), in.id.get)
+        Bar(in.name, None, Has[Foo](in.fooId), in.id.get)
       }
 
       val row = BarRow("test", Random.nextInt, Some(Random.nextInt))

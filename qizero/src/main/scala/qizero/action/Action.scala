@@ -4,7 +4,7 @@ import scala.concurrent.ExecutionContext.global
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Invoker {
-  _: Action[_] =>
+  self: Action[_] =>
   type Result
   protected def invoke(): Result
 }
