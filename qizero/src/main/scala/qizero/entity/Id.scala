@@ -24,7 +24,7 @@ object TypedId {
   implicit def toId[T <: TypedId](value: Long)(implicit factory: Factory[T]): T = factory(value)
 }
 
-object TypedIdMacro {
+private object TypedIdMacro {
   def materializeFactory[T <: TypedId : c.WeakTypeTag](c: Context): c.Tree = {
     import c.universe._
 

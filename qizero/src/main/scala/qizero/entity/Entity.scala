@@ -4,17 +4,18 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 import org.joda.time.DateTime
 
-trait Entity {
-  type ID
-  def id: ID
-}
+trait Entity
 
 object Entity {
   def mapper[IN, OUT](f: IN => OUT) = Mapper(f)
   def mapper[IN, OUT]: Mapper[IN, OUT] = macro EntityMacros.materialize[IN, OUT]
 }
 
-trait Id[I] {
+private[entity] trait EntityWithId extends Entity {
+  type ID
+  def id: ID
+}
+trait Id[I] extends EntityWithId {
   _: Entity =>
   type ID = I
   def id: ID
@@ -56,13 +57,18 @@ private object EntityMacros {
     def getParams() = outParams.flatMap { param =>
       val paramName = param.name.toTermName
       val paramType = param.typeSignature
-      if (paramType <:< typeOf[Has[_]]) {
-        val entityType = paramType.typeArgs(0)
+      if (paramType <:< typeOf[Has[_]] || paramType <:< typeOf[Option[Has[_]]]) {
         val inIdParamOpt = inParams.find(_.name.decodedName.toString == paramName.decodedName.toString + "Id")
         inIdParamOpt match {
           case Some(idParam) =>
             val idParamName = idParam.name.toTermName
-            Some(q"$paramName = new _root_.qizero.entity.HasId[$entityType](in.$idParamName)")
+            if(paramType <:< typeOf[Option[Has[_]]]){
+              val entityType = paramType.typeArgs(0).typeArgs(0)
+              Some(q"$paramName = in.$idParamName.map(id => new _root_.qizero.entity.HasId[$entityType](id))")
+            }else {
+              val entityType = paramType.typeArgs(0)
+              Some(q"$paramName = new _root_.qizero.entity.HasId[$entityType](in.$idParamName)")
+            }
           case None => c.abort(c.enclosingPosition, "Missing Param Id:" + paramName)
         }
       } else {

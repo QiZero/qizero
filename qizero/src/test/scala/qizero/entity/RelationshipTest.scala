@@ -9,7 +9,7 @@ class RelationshipTest extends WordSpec with Matchers {
 
   case class Bar(name: String, foo: Has[Foo], id: Long) extends Entity with Id[Long]
 
-  case class Bars(foos: HasMany[Foo] = HasMany.empty, id: Long) extends Entity with Id[Long]
+  case class Bars(foos: HasMany[Foo] = HasMany.None, id: Long) extends Entity with Id[Long]
 
   implicit val fooFormat = Json.format[Foo]
   implicit val barFormat = Json.format[Bar]
@@ -126,7 +126,7 @@ class RelationshipTest extends WordSpec with Matchers {
     }
 
     "mapper HasEmpty to json" in {
-      val bars = Bars(HasMany.empty, 1)
+      val bars = Bars(HasMany.None, 1)
 
       val toJson = Json.toJson(bars)
       val fromJson = Json.fromJson[Bars](toJson).get
