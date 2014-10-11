@@ -1,10 +1,9 @@
 package qizero.action.db
 
 import scala.slick.lifted.Query
-import qizero.persistence.query.IdQueries
 import qizero.persistence._
 
-trait InsertAction[R] extends QueriedAction[R]{
+trait InsertAction[R] extends QueriedAction[R] {
   self: DBAction[_] =>
 
   lazy val statement: String = {
@@ -25,12 +24,14 @@ final class Insert[R](val query: Query[_, R, Seq], row: R)
   }
 }
 
-final class InsertReturningId[R <: RowId[ID], ID](val query: Query[_ <: HasId[ID], R, Seq], row: R)
-                                                 (implicit val dal: DAL)
-  extends DBAction[R] with InsertAction[R] with IdQueries {
+final class InsertReturningId[R <: AutoIncId[ID], ID](val query: Query[_ <: HasAutoIncId[ID], R, Seq], row: R)
+                                                     (implicit val dal: DAL)
+  extends DBAction[R] with InsertAction[R] {
+
+  import dal.profile.simple._
 
   protected def act(): R = {
-    query.returningId(copyId).insert(row)
+    query.returning(query.map(_.id)).into(copyId).insert(row)
   }
 
   private def copyId(row: R, id: ID): R = {

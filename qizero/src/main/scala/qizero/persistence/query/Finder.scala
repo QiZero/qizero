@@ -16,8 +16,8 @@ trait Finder[R] {
   def count: DBAction[Int]
   def exists: DBAction[Boolean]
 
-  def as[T](implicit mapper: Mapper[R, T]): Finder[T] = new MappedFinder[R, T](this, mapper)
-  def map[T](f: R => T): Finder[T] = as(Mapper(f))
+  final def as[T](implicit mapper: Mapper[R, T]): Finder[T] = new MappedFinder[R, T](this, mapper)
+  final def map[B](f: R => B): Finder[B] = as(Mapper(f))
 }
 
 private final class QueriedFinder[R](query: Query[_, R, Seq])(implicit dal: DAL) extends Finder[R] {
@@ -26,8 +26,8 @@ private final class QueriedFinder[R](query: Query[_, R, Seq])(implicit dal: DAL)
   def all = new QueriedFindAll(query)
   def page(pagination: Pagination) = new QueriedFindPage(query, pagination)
   def slice(pagination: Pagination) = new QueriedFindSlice(query, pagination)
-  override def count = new QueriedFindCount[R](query)
-  override def exists = new QueriedFindExists[R](query)
+  def count = new QueriedFindCount[R](query)
+  def exists = new QueriedFindExists[R](query)
 }
 
 private final class CompiledFinder[R, C[_]](compiled: RunnableCompiled[_ <: Query[_, R, C], C[R]])(implicit dal: DAL) extends Finder[R] {

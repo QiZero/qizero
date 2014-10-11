@@ -21,6 +21,10 @@ trait HasId[ID] {
   def id: Column[ID]
 }
 
-trait RowId[ID] {
-  def withId(id: ID): RowId[ID]
+trait HasAutoIncId[ID] extends HasId[ID] {
+  _: AbstractTable[_] =>
+}
+
+trait AutoIncId[ID] {
+  def withId(id: ID): AutoIncId[ID]
 }
