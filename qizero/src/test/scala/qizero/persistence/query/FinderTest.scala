@@ -2,6 +2,7 @@ package qizero.persistence.query
 
 import org.scalatest.{Matchers, WordSpec}
 import qizero.entity.Mapper
+import qizero.model.Pagination
 import qizero.persistence.{DBSpec, TestDAL}
 
 class FinderTest extends WordSpec with Matchers with DBSpec {
@@ -35,6 +36,14 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
       val result = Foos.find.all.run
       result should have size (10)
     }
+    "find page" in new WithData {
+      val result = Foos.find.page(Pagination(1, 20)).run
+      result.count shouldBe 10
+    }
+    "find slice" in new WithData {
+      val result = Foos.find.slice(Pagination(1, 20)).run
+      result.count shouldBe 10
+    }
     "count" in new WithData {
       val result = Foos.find.count.run
       result shouldBe 10
@@ -56,6 +65,14 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
     "find list" in new WithData {
       val result = Foos.find.as[Foo].all.run
       result should have size (10)
+    }
+    "find page" in new WithData {
+      val result = Foos.find.as[Foo].page(Pagination(1, 20)).run
+      result.count shouldBe 10
+    }
+    "find slice" in new WithData {
+      val result = Foos.find.as[Foo].slice(Pagination(1, 20)).run
+      result.count shouldBe 10
     }
   }
 }

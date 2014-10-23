@@ -58,6 +58,10 @@ trait DefaultConfigReads {
     def read(config: Config, path: String): Duration = Duration(config.getDuration(path, MILLISECONDS), MILLISECONDS)
   }
 
+  implicit object FiniteDurationReads extends ConfigReads[FiniteDuration] {
+    def read(config: Config, path: String): FiniteDuration = FiniteDuration(config.getDuration(path, MILLISECONDS), MILLISECONDS)
+  }
+
   implicit def OptionReads[T](implicit reads: ConfigReads[T]): ConfigReads[Option[T]] = {
     ConfigReads { (config: Config, path: String) =>
       if (config.hasPath(path)) Some(reads.read(config, path)) else None
