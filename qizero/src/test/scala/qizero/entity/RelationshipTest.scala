@@ -26,7 +26,7 @@ class RelationshipTest extends WordSpec with Matchers {
 
     }
 
-    "return entity whe HasEntity" in {
+    "return entity when HasEntity" in {
       val foo = Foo("foo", 10, 1)
 
       val bar = Bar("bar", Has(foo), 1)
@@ -39,12 +39,12 @@ class RelationshipTest extends WordSpec with Matchers {
 
     "implicit convert entity to HasEntity" in {
       val foo = Foo("foo", 10, 1)
-      val bar = Bar("bar", foo, 1)
+      val hasFoo: Has[Foo] = Has(foo)
+      val optFoo: Option[Has[Foo]] = hasFoo
+      optFoo should not be None
+      optFoo.get shouldBe hasFoo
+      optFoo.get.id shouldBe hasFoo.id
 
-      bar.foo.isId shouldBe true
-      bar.foo.id shouldBe foo.id
-      bar.foo.isEntity shouldBe true
-      bar.foo.entity shouldBe foo
     }
 
     "mapper HasId to json" in {

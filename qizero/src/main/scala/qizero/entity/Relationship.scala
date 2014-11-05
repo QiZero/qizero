@@ -17,6 +17,7 @@ object Has {
 
   implicit def fromEntity[E <: EntityWithId](entity: E) = apply(entity)
   implicit def fromId[E <: EntityWithId](id: E#ID) = apply(id)
+  implicit def toOption[E <: EntityWithId](entity: Has[E]) = Some(entity)
 
   implicit def HasWrites[E <: EntityWithId](implicit format: Writes[E], idFormat: Writes[E#ID]) = new Writes[Has[E]] {
     def writes(o: Has[E]): JsValue = {
@@ -52,6 +53,7 @@ sealed trait HasMany[+E <: EntityWithId] {
 }
 
 object HasMany {
+
   object None extends HasMany[Nothing] {
     val ids = Nil
     val entities = Nil
@@ -67,13 +69,13 @@ object HasMany {
 
   implicit def HasWrites[E <: EntityWithId](implicit format: Writes[E], idFormat: Writes[E#ID]) = new Writes[HasMany[E]] {
     def writes(o: HasMany[E]): JsValue = {
-      if(o.isEntities) Writes.traversableWrites[E].writes(o.entities)
+      if (o.isEntities) Writes.traversableWrites[E].writes(o.entities)
       else Writes.traversableWrites[E#ID].writes(o.ids)
     }
   }
 
   implicit def HasReads[E <: EntityWithId](implicit format: Reads[E], idFormat: Reads[E#ID]) = new Reads[HasMany[E]] {
-    def reads(json: JsValue): JsResult[HasMany[E]] = json match{
+    def reads(json: JsValue): JsResult[HasMany[E]] = json match {
       case JsArray(elems) if elems.isEmpty => JsSuccess(HasMany.None)
       case _ => Reads.traversableReads[List, E#ID].reads(json).map(id => HasIds(id)).orElse {
         Reads.traversableReads[List, E].reads(json).map(e => HasEntities(e))
