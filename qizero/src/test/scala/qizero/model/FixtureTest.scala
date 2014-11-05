@@ -4,8 +4,6 @@ import org.joda.time.DateTime
 import org.scalatest.{Matchers, WordSpec}
 
 class FixtureTest extends WordSpec with Matchers {
-  import Fixture._
-
   case class Foo(
                   string: String,
                   bool: Boolean,
