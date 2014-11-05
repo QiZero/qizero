@@ -39,12 +39,29 @@ class RelationshipTest extends WordSpec with Matchers {
 
     "implicit convert entity to HasEntity" in {
       val foo = Foo("foo", 10, 1)
-      val hasFoo: Has[Foo] = Has(foo)
-      val optFoo: Option[Has[Foo]] = hasFoo
-      optFoo should not be None
-      optFoo.get shouldBe hasFoo
-      optFoo.get.id shouldBe hasFoo.id
+      val bar = Bar("bar", foo, 1)
+      bar.foo.isId shouldBe true
+      bar.foo.id shouldBe foo.id
+      bar.foo.isEntity shouldBe true
+      bar.foo.entity shouldBe foo
+    }
 
+    "implicit convert option entity to option HasEntity" in {
+      val foo = Foo("foo", 10, 1)
+      val optFoo = Option(foo)
+      val optHasFoo: Option[Has[Foo]] = optFoo
+      optHasFoo should not be None
+      optHasFoo.get.entity shouldBe optFoo.get
+      optHasFoo.get.id shouldBe optFoo.get.id
+    }
+
+    "implicit convert HasEntity to option HasEntity" in {
+      val foo = Foo("foo", 10, 1)
+      val hasFoo = Has(foo)
+      val optHasFoo: Option[Has[Foo]] = hasFoo
+      optHasFoo should not be None
+      optHasFoo.get shouldBe hasFoo
+      optHasFoo.get.id shouldBe hasFoo.id
     }
 
     "mapper HasId to json" in {

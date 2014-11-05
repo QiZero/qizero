@@ -17,6 +17,8 @@ object Has {
 
   implicit def fromEntity[E <: EntityWithId](entity: E) = apply(entity)
   implicit def fromId[E <: EntityWithId](id: E#ID) = apply(id)
+
+  implicit def fromOptionEntity[E <:EntityWithId](entity:Option[E]) = entity.map(fromEntity)
   implicit def toOption[E <: EntityWithId](entity: Has[E]) = Some(entity)
 
   implicit def HasWrites[E <: EntityWithId](implicit format: Writes[E], idFormat: Writes[E#ID]) = new Writes[Has[E]] {
