@@ -1,6 +1,7 @@
 package qizero.persistence
 
-import query.Queries
+import scala.slick.jdbc.GetResult
+import qizero.persistence.query.Queries
 
 object TestDAL
   extends NamedDAL("test")
@@ -12,9 +13,13 @@ trait Tables {
 
   import profile.simple._
 
-  lazy val ddl = Foos.ddl
+  lazy val ddl = Foos.ddl ++ Bars.ddl
 
-  case class FooRow(str: String, id: Option[Long] = None)
+  case class FooRow(str: String, id: Option[Long] = None) extends AutoIncId[Long] {
+    override def withId(id: Long): AutoIncId[Long] = copy(id = Some(id))
+  }
+
+  implicit val getFooRowResult = GetResult(r => FooRow(r.<<, r.<<))
 
   class Foos(tag: Tag) extends Table[FooRow](tag, "foos") {
     val str = column[String]("str")
@@ -25,7 +30,11 @@ trait Tables {
 
   lazy val Foos = TableQuery[Foos]
 
-  case class BarRow(str: String, fooId: Long, id: Option[Long] = None)
+  case class BarRow(str: String, fooId: Long, id: Option[Long] = None) extends AutoIncId[Long] {
+    override def withId(id: Long): AutoIncId[Long] = copy(id = Some(id))
+  }
+
+  implicit val getBarRowResult = GetResult(r => BarRow(r.<<, r.<<, r.<<))
 
   class Bars(tag: Tag) extends Table[BarRow](tag, "bars") {
     val str = column[String]("str")
