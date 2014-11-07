@@ -22,6 +22,7 @@ object TypedId {
   implicit def toId[T <: TypedId](value: Short)(implicit factory: Factory[T]): T = factory(value)
   implicit def toId[T <: TypedId](value: Int)(implicit factory: Factory[T]): T = factory(value)
   implicit def toId[T <: TypedId](value: Long)(implicit factory: Factory[T]): T = factory(value)
+  implicit def typedIdToLong(id: TypedId): Long = id.value
 }
 
 private object TypedIdMacro {
