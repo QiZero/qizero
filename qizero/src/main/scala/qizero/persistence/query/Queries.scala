@@ -8,6 +8,12 @@ import qizero.persistence._
 
 trait Queries {
 
+  implicit final class MaybeFilter[E, U](query: Query[E, U, Seq]) {
+    def maybeFilter[V, T:CanBeQueryCondition](value: Option[V])(f: (E, V) => T) = {
+      value.map(v => query.withFilter(q => f(q, v))).getOrElse(query)
+    }
+  }
+
   implicit final class ToQueriedFinder[R](query: Query[_, R, Seq])(implicit dal: DAL) {
     def find: Finder[R] = new QueriedFinder(query)
   }
