@@ -11,6 +11,8 @@ object Configuration {
 
   def empty(): Configuration = apply(ConfigFactory.empty)
 
+  def load(resourceBasename: String) = apply(ConfigFactory.load(resourceBasename))
+
   implicit object ConfigurationReads extends ConfigReads[Configuration] {
     def read(config: Config, path: String): Configuration = apply(config.getConfig(path))
   }

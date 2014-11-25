@@ -4,7 +4,7 @@ package qizero.entity
 import scala.annotation.implicitNotFound
 import scala.language.experimental.macros
 import scala.language.implicitConversions
-import scala.reflect.macros.whitebox.Context
+import scala.reflect.macros.whitebox
 import scala.slick.lifted.MappedTo
 
 trait TypedId extends Any with MappedTo[Long] {
@@ -26,7 +26,7 @@ object TypedId {
 }
 
 private object TypedIdMacro {
-  def materializeFactory[T <: TypedId : c.WeakTypeTag](c: Context): c.Tree = {
+  def materializeFactory[T <: TypedId : c.WeakTypeTag](c: whitebox.Context): c.Tree = {
     import c.universe._
 
     val allImplicitCandidates = c.openImplicits.map(_.pt.dealias)

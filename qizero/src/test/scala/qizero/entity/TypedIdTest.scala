@@ -11,6 +11,7 @@ class TypedIdTest extends FunSuite with Matchers {
     val id1 = TypedId.toId[TestId](1)
     val id2: TestId = 1L
     val id3: TestId = 1
+    val value:Long = id
     id shouldBe id1
     id shouldBe id2
     id shouldBe id3

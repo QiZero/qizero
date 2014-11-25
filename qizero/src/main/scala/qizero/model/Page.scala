@@ -30,7 +30,7 @@ trait Chuck[T] {
 
   def count: Int = content.length
 
-  def hasContent: Boolean = !content.isEmpty
+  def hasContent: Boolean = content.nonEmpty
 
   def isFirst: Boolean = !hasPrevious
   def isLast: Boolean = !hasNext
@@ -56,7 +56,7 @@ final class Slice[T](
 
 object Slice {
 
-  implicit def SliceWrites[T: Writes] = Writes { p: Slice[T] =>
+  implicit def SliceWrites[T: Writes]: Writes[Slice[T]] = Writes { p: Slice[T] =>
     Json.obj(
       "data" -> p.content,
       "page" -> Json.obj(
@@ -78,9 +78,9 @@ final class Page[T](
                      ) extends Chuck[T] {
   require(total >= 0, "Total must not be less than zero!")
 
-  lazy val totalPages: Int = Math.ceil(total / size).toInt
+  val totalPages: Int = Math.ceil(total.toDouble / size.toDouble).toInt
 
-  lazy val hasNext: Boolean = number < totalPages
+  def hasNext: Boolean = number < totalPages
 
   def map[B](f: T => B): Page[B] = new Page(content.map(f), pagination, total)
 
@@ -88,7 +88,7 @@ final class Page[T](
 
 object Page {
 
-  implicit def PageWrites[T: Writes] = Writes { p: Page[T] =>
+  implicit def PageWrites[T: Writes]: Writes[Page[T]] = Writes { p: Page[T] =>
     Json.obj(
       "data" -> p.content,
       "page" -> Json.obj(
