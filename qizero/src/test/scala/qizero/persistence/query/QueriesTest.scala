@@ -22,10 +22,12 @@ class QueriesTest extends FunSuite with DBSpec {
   test("Optional Filter") {
     import dal.profile.simple._
     val opt:Option[String] = None
+    val opt2:String = noFilter
     val query = Foos
       .maybeFilter(Some("1"))(_.str === _)
       .maybeFilter(opt)(_.str === _)
       .maybeFilter(Some("2"))(_.str === _)
+      .maybeFilter(opt2)(_.str === _)
       .sortBy(_.str)
 
     val finder = query.find.all

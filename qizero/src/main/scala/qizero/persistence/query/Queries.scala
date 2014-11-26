@@ -1,17 +1,23 @@
 package qizero.persistence.query
 
-import scala.language.{existentials, higherKinds, implicitConversions}
-import scala.slick.lifted._
 import qizero.action.db._
 import qizero.entity.Mapper
 import qizero.persistence._
+import scala.language.{existentials, higherKinds, implicitConversions}
+import scala.slick.lifted._
 
 trait Queries {
+  final val noFilter = null
 
   implicit final class MaybeFilter[E, U](query: Query[E, U, Seq]) {
-    def maybeFilter[V, T:CanBeQueryCondition](value: Option[V])(f: (E, V) => T) = {
+    def maybeFilter[V, T: CanBeQueryCondition](value: Option[V])(f: (E, V) => T): Query[E, U, Seq] = {
       value.map(v => query.withFilter(q => f(q, v))).getOrElse(query)
     }
+
+    def maybeFilter[V, T: CanBeQueryCondition](value: V)(f: (E, V) => T): Query[E, U, Seq] = {
+      maybeFilter(Option(value))(f)
+    }
+
   }
 
   implicit final class ToQueriedFinder[R](query: Query[_, R, Seq])(implicit dal: DAL) {
