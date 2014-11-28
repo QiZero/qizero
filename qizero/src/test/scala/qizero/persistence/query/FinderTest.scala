@@ -20,7 +20,7 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
   trait WithData {
     val numElems = 50
     (1 to numElems).foreach { i =>
-      Foos.insert(FooRow(s"test$i", Some(i))).run
+      Foos.insert(FooRow(s"test$i", true, Some(i))).run
     }
   }
 

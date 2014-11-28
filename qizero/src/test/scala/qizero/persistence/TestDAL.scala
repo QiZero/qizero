@@ -15,7 +15,7 @@ trait Tables {
 
   lazy val ddl = Foos.ddl ++ Bars.ddl
 
-  case class FooRow(str: String, id: Option[Long] = None) extends AutoIncId[Long] {
+  case class FooRow(str: String, flag:Boolean = false, id: Option[Long] = None) extends AutoIncId[Long] {
     override def withId(id: Long): AutoIncId[Long] = copy(id = Some(id))
   }
 
@@ -23,9 +23,10 @@ trait Tables {
 
   class Foos(tag: Tag) extends Table[FooRow](tag, "foos") {
     val str = column[String]("str")
+    val flag = column[Boolean]("flag")
     val id = column[Long]("id", O.AutoInc, O.PrimaryKey)
 
-    def * = (str, id.?) <>(FooRow.tupled, FooRow.unapply)
+    def * = (str, flag, id.?) <>(FooRow.tupled, FooRow.unapply)
   }
 
   lazy val Foos = TableQuery[Foos]
