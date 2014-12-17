@@ -4,6 +4,7 @@ import qizero.model._
 import scala.annotation.implicitNotFound
 import scala.collection.Traversable
 import scala.language.implicitConversions
+import scala.annotation.StaticAnnotation
 
 @implicitNotFound("No implicit Mapper defined for ${IN} -> ${OUT}.")
 trait Mapper[IN, OUT] extends (IN => OUT)
@@ -35,3 +36,5 @@ trait DefaultMappers {
     Mapper { in: Slice[IN] => in.map(mapper)}
   }
 }
+
+case class InNamed(name: String) extends StaticAnnotation

@@ -1,10 +1,9 @@
 package qizero.entity
 
-import scala.util.Random
 import org.scalatest._
+import scala.util.Random
 
 class EntityTest extends WordSpec with Matchers {
-
 
   case class FooId(value: Long) extends TypedId
 
@@ -14,9 +13,13 @@ class EntityTest extends WordSpec with Matchers {
 
   case class BarId(value: Long) extends TypedId
 
-  case class Bar(name: String, email:Option[String] = None, foo: Has[Foo], fooOpt:Option[Has[Foo]], id: BarId) extends Entity with Id[BarId]
+  case class Bar(name: String, email: Option[String] = None, foo: Has[Foo], fooOpt: Option[Has[Foo]], id: BarId) extends Entity with Id[BarId]
 
-  case class BarRow(name: String, fooId: FooId, fooOptId:Option[FooId] = None, id: Option[BarId])
+  case class BarRow(name: String, fooId: FooId, fooOptId: Option[FooId] = None, id: Option[BarId])
+
+  case class Named(@InNamed("cba") abc: String, num: Int, @InNamed("abc") foo: Has[Foo], @InNamed("cbaId") abcId: FooId)
+
+  case class NamedRow(cba: String, num: Int, abcId: FooId, cbaId: FooId)
 
   "Entity" should {
     "has id" in {
@@ -66,6 +69,17 @@ class EntityTest extends WordSpec with Matchers {
       entity.id shouldBe row.id.get
       entity.name shouldBe row.name
       entity.foo.id shouldBe row.fooId
+    }
+
+    "materialzer mapper with InNamed" in {
+      val mapper = Entity.mapper[NamedRow, Named]
+
+      val row = NamedRow("test", Random.nextInt, Random.nextInt, Random.nextInt)
+      val entity = mapper(row)
+      entity.abc shouldBe row.cba
+      entity.num shouldBe row.num
+      entity.abcId shouldBe row.cbaId
+      entity.foo.id shouldBe row.abcId
     }
   }
 }

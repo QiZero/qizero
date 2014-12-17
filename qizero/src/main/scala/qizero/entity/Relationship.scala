@@ -44,7 +44,7 @@ object Has {
 final case class HasId[E <: EntityWithId](id: E#ID) extends Has[E] {
   def entity: E = throw new NoSuchElementException("Has.entity on HasId")
 
-  val isId: Boolean = true
+  val isId = true
   val isEntity = false
 }
 
