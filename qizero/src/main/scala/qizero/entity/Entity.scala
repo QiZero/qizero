@@ -74,12 +74,17 @@ private object EntityMacros {
           inIdParamOpt match {
             case Some(idParam) =>
               val idParamName = idParam.name.toTermName
+              val idParamType = idParam.typeSignature
               if (paramType <:< typeOf[Option[Has[_]]]) {
                 val entityType = paramType.typeArgs(0).typeArgs(0)
                 Some(q"$paramName = in.$idParamName.map(id => new _root_.qizero.entity.HasId[$entityType](id))")
               } else {
                 val entityType = paramType.typeArgs(0)
-                Some(q"$paramName = new _root_.qizero.entity.HasId[$entityType](in.$idParamName)")
+                if (idParamType <:< typeOf[Option[_]]) {
+                  Some(q"$paramName = new _root_.qizero.entity.HasId[$entityType](in.$idParamName.get)")
+                } else {
+                  Some(q"$paramName = new _root_.qizero.entity.HasId[$entityType](in.$idParamName)")
+                }
               }
             case None => c.abort(c.enclosingPosition, s"""Missing Param Id: $idTermName in (${inParams.mkString(",")})""")
           }
