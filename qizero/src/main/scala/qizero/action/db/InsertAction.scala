@@ -7,7 +7,7 @@ trait InsertAction[R] extends QueriedAction[R] {
   self: DBAction[_] =>
 
   lazy val statement: String = {
-    import dal.profile.simple._
+    import dal.profile.api._
     query.insertStatement
   }
 }
@@ -31,7 +31,9 @@ final class InsertReturningId[R <: AutoIncId[ID], ID](val query: Query[_ <: HasA
   import dal.profile.simple._
 
   protected def act(): R = {
-    query.returning(query.map(_.id)).into(copyId).insert(row)
+    val q = query.map(_.id)
+    val id = query.returning(q).insert(row)
+    copyId(row, id)
   }
 
   private def copyId(row: R, id: ID): R = {

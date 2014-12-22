@@ -6,7 +6,7 @@ object BuildSettings {
   object Basic {
     val settings = Seq(
       organization := "qizero",
-      scalaVersion := "2.11.2",
+      scalaVersion := "2.11.4",
       resolvers ++= Dependencies.resolvers,
       scalacOptions ++= Seq(
         "-encoding", "UTF-8",

@@ -5,12 +5,14 @@ import qizero.entity.Mapper
 import qizero.model.SortBy
 import qizero.persistence._
 import scala.language.{existentials, higherKinds, implicitConversions}
-import scala.slick.lifted._
+import scala.slick.lifted.{RunnableCompiled, CanBeQueryCondition, Rep, Query}
 
 trait Queries {
 
-  implicit final class MaybeSortBy[E, U](query: Query[E, U, Seq]) {
-    def maybeSortBy[V, T](sortBy: Option[SortBy])(f: E => Column[T]): Query[E, U, Seq] = {
+  implicit final class MaybeSortBy[E, U](query: Query[E, U, Seq])(implicit dal: DAL) {
+
+    def maybeSortBy[V, T](sortBy: Option[SortBy])(f: E => Rep[T]): Query[E, U, Seq] = {
+      import dal.profile.simple._
       sortBy.map {
         case SortBy.Desc => query.sortBy(f(_).desc)
         case SortBy.Desc.NullsFirst => query.sortBy(f(_).desc.nullsFirst)
