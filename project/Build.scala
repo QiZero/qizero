@@ -17,7 +17,7 @@ object Build extends Build {
       libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _),
       libraryDependencies ++= provided(slick, Play.json, Akka.actor),
       libraryDependencies ++= compile(slf4j, config, jodaTime, jodaConvert),
-      libraryDependencies ++= test(scalatest, scalamock, h2)
+      libraryDependencies ++= test(mockito,  scalatest, scalamock, h2)
     )
 
   val testkit = Project("qizero-testkit", file("qizero-testkit"))
@@ -25,7 +25,7 @@ object Build extends Build {
     .settings(Basic.settings: _*)
     .settings(
       libraryDependencies ++= optional(slick, Play.json),
-      libraryDependencies ++= compile(scalatest, Akka.testkit, h2)
+      libraryDependencies ++= compile(mockito, scalatest, Akka.testkit, h2)
     )
   // -------------------------------------------------------------------------------------------------------------------
   // Root

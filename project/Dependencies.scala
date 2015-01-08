@@ -36,6 +36,7 @@ object Dependencies {
   }
 
   // Test
+  val mockito = "org.mockito" % "mockito-core" % "1.9.5"
   val scalatest = "org.scalatest" %% "scalatest" % "2.2.1"
   val scalamock = "org.scalamock" %% "scalamock-scalatest-support" % "3.2"
 

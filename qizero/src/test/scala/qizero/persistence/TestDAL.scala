@@ -1,5 +1,6 @@
 package qizero.persistence
 
+import qizero.entity.TypedId
 import scala.slick.jdbc.GetResult
 import qizero.persistence.query.Queries
 
@@ -15,16 +16,17 @@ trait Tables {
 
   lazy val ddl = Foos.ddl ++ Bars.ddl
 
-  case class FooRow(str: String, flag:Boolean = false, id: Option[Long] = None) extends AutoIncId[Long] {
-    override def withId(id: Long): AutoIncId[Long] = copy(id = Some(id))
+  case class FooId(value:Long) extends TypedId
+  case class FooRow(str: String, flag:Boolean = false, id: Option[FooId] = None) extends AutoIncId[FooId] {
+    override def withId(id: FooId): AutoIncId[FooId] = copy(id = Some(id))
   }
 
   implicit val getFooRowResult = GetResult(r => FooRow(r.<<, r.<<))
 
-  class Foos(tag: Tag) extends Table[FooRow](tag, "foos") {
+  class Foos(tag: Tag) extends Table[FooRow](tag, "foos") with HasAutoIncId[FooId]{
     val str = column[String]("str")
     val flag = column[Boolean]("flag")
-    val id = column[Long]("id", O.AutoInc, O.PrimaryKey)
+    val id = column[FooId]("id", O.AutoInc, O.PrimaryKey)
 
     def * = (str, flag, id.?) <>(FooRow.tupled, FooRow.unapply)
   }
@@ -37,7 +39,7 @@ trait Tables {
 
   implicit val getBarRowResult = GetResult(r => BarRow(r.<<, r.<<, r.<<))
 
-  class Bars(tag: Tag) extends Table[BarRow](tag, "bars") {
+  class Bars(tag: Tag) extends Table[BarRow](tag, "bars")  with HasAutoIncId[Long] {
     val str = column[String]("str")
     val fooId = column[Long]("foo_id")
     val id = column[Long]("id", O.AutoInc, O.PrimaryKey)

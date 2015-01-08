@@ -1,17 +1,19 @@
 package qizero.persistence.query
 
 import qizero.action.db._
-import qizero.entity.Mapper
+import qizero.entity.{Mapper, TypedId}
 import qizero.model.SortBy
 import qizero.persistence._
 import scala.language.{existentials, higherKinds, implicitConversions}
-import scala.slick.lifted.{RunnableCompiled, CanBeQueryCondition, Rep, Query}
+import slick.ast.{BaseTypedType, TypedType}
+import slick.lifted._
+
+object Queries extends Queries
 
 trait Queries {
 
   implicit final class MaybeSortBy[E, U](query: Query[E, U, Seq])(implicit dal: DAL) {
-
-    def maybeSortBy[V, T](sortBy: Option[SortBy])(f: E => Rep[T]): Query[E, U, Seq] = {
+    def maybeSortBy[V, T: TypedType](sortBy: Option[SortBy])(f: E => Rep[T]): Query[E, U, Seq] = {
       import dal.profile.simple._
       sortBy.map {
         case SortBy.Desc => query.sortBy(f(_).desc)
@@ -38,7 +40,7 @@ trait Queries {
     def find: Finder[R] = new CompiledFinder(compiled)
   }
 
-  implicit final class InsertReturningIdAction[ID, R <: AutoIncId[ID]](query: Query[_ <: HasAutoIncId[ID], R, Seq])(implicit dal: DAL) {
+  implicit final class InsertReturningIdAction[ID, R <: AutoIncId[ID]](query: Query[_ <: HasAutoIncId[ID], R, Seq])(implicit dal: DAL, typedType: BaseTypedType[ID]) {
     def insert(row: R) = new InsertReturningId(query, row)
   }
 

@@ -2,6 +2,7 @@ package qizero.persistence
 
 import org.joda.time.DateTime
 import scala.slick.lifted.{AbstractTable, Rep}
+import slick.ast.TypedType
 
 trait HasUpdatedAt {
   _: AbstractTable[_] =>
