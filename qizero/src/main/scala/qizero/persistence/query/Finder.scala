@@ -16,8 +16,8 @@ trait Finder[R] {
   def count: DBAction[Int]
   def exists: DBAction[Boolean]
 
-  final def page(pageNumber: Int, pageSize: Int) = page(Pagination(pageNumber, pageSize))
-  final def slice(pageNumber: Int, pageSize: Int) = slice(Pagination(pageNumber, pageSize))
+  final def page(pageNumber: Int, pageSize: Int): DBAction[Page[R]] = page(Pagination(pageNumber, pageSize))
+  final def slice(pageNumber: Int, pageSize: Int): DBAction[Slice[R]] = slice(Pagination(pageNumber, pageSize))
 
   final def as[T](implicit mapper: Mapper[R, T]): Finder[T] = new MappedFinder[R, T](this, mapper)
   final def map[B](f: R => B): Finder[B] = as(Mapper(f))

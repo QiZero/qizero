@@ -1,6 +1,7 @@
 package qizero.entity
 
 
+import qizero.entity.TypedId.Factory
 import scala.annotation.implicitNotFound
 import scala.language.experimental.macros
 import scala.language.implicitConversions
@@ -9,9 +10,12 @@ import scala.slick.lifted.MappedTo
 
 trait TypedId extends Any with MappedTo[Long] {
   def value: Long
+
+  override def toString: String = value.toString
 }
 
 object TypedId {
+
   @implicitNotFound("No implicit Factory defined for ${I}.")
   trait Factory[I <: TypedId] extends (Long => I)
 
@@ -20,9 +24,12 @@ object TypedId {
   }
 
   implicit def toId[T <: TypedId](value: Short)(implicit factory: Factory[T]): T = factory(value)
+
   implicit def toId[T <: TypedId](value: Int)(implicit factory: Factory[T]): T = factory(value)
+
   implicit def toId[T <: TypedId](value: Long)(implicit factory: Factory[T]): T = factory(value)
-  implicit def typedIdToLong(id: TypedId): Long = id.value
+
+  implicit def toLong(id: TypedId): Long = id.value
 }
 
 private object TypedIdMacro {

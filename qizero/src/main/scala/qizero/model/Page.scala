@@ -1,6 +1,7 @@
 package qizero.model
 
 import play.api.libs.json._
+import annotation.implicitNotFound
 
 final case class Pagination(pageNumber: Int, pageSize: Int) {
   require(pageNumber > 0, "Page index must be greater than zero!")
@@ -33,12 +34,15 @@ trait Chuck[T] {
   def hasContent: Boolean = content.nonEmpty
 
   def isFirst: Boolean = !hasPrevious
+
   def isLast: Boolean = !hasNext
 
   def hasNext: Boolean
+
   def hasPrevious: Boolean = number > 1
 
   def next: Pagination = pagination.next
+
   def previous: Pagination = pagination.previous
 
 }
@@ -59,7 +63,7 @@ object Slice {
   implicit def SliceWrites[T: Writes]: Writes[Slice[T]] = Writes { p: Slice[T] =>
     Json.obj(
       "data" -> p.content,
-      "page" -> Json.obj(
+      "paging" -> Json.obj(
         "number" -> p.number,
         "size" -> p.size,
         "count" -> p.count,
@@ -91,7 +95,7 @@ object Page {
   implicit def PageWrites[T: Writes]: Writes[Page[T]] = Writes { p: Page[T] =>
     Json.obj(
       "data" -> p.content,
-      "page" -> Json.obj(
+      "paging" -> Json.obj(
         "number" -> p.number,
         "size" -> p.size,
         "count" -> p.count,
@@ -101,4 +105,55 @@ object Page {
       )
     )
   }
+}
+
+
+final case class Cursor(size: Int, before: Option[String] = None, after: Option[String] = None) {
+  require(size > 0, "Size must be equal or greater than zero!")
+}
+
+@implicitNotFound("No implicit CursorWriter defined for ${T}.")
+trait CursorWriter[T] {
+  def write(value: T): String
+}
+
+object CursorWriter {
+  def apply[T](f: T => String) = new CursorWriter[T] {
+    def write(value: T): String = f(value)
+  }
+}
+
+final class Line[T](val content: Seq[T], cursor: Cursor)
+                   (implicit writer: CursorWriter[T]) {
+
+  lazy val before: Option[String] = {
+    content.headOption.map(writer.write).orElse(cursor.before).orElse(cursor.after)
+  }
+
+  lazy val after: Option[String] = {
+    content.lastOption.map(writer.write).orElse(cursor.after).orElse(cursor.before)
+  }
+
+  def size: Int = cursor.size
+
+  def count: Int = content.length
+
+}
+
+object Line {
+
+  implicit def CursoredChuckWrites[T: Writes]: Writes[Line[T]] = Writes { p: Line[T] =>
+    Json.obj(
+      "data" -> p.content,
+      "paging" -> Json.obj(
+        "cursor" -> Json.obj(
+          "before" -> p.before,
+          "after" -> p.after
+        ),
+        "size" -> p.size,
+        "count" -> p.count
+      )
+    )
+  }
+
 }

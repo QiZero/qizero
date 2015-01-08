@@ -15,15 +15,17 @@ sealed trait Has[E <: EntityWithId] {
 }
 
 object Has {
-  def apply[E <: EntityWithId](entity: E) = HasEntity[E](entity)
+  def apply[E <: EntityWithId](entity: E): Has[E] = HasEntity[E](entity)
 
-  def apply[E <: EntityWithId](id: E#ID) = HasId[E](id)
+  def apply[E <: EntityWithId](id: E#ID): Has[E] = HasId[E](id)
 
-  implicit def fromEntity[E <: EntityWithId](entity: E): HasEntity[E] = apply(entity)
+  def apply[E <: EntityWithId](entity: Option[E]): Option[Has[E]] = entity.map(HasEntity[E])
 
-  implicit def fromId[E <: EntityWithId](id: E#ID): HasId[E] = apply(id)
+  implicit def fromEntity[E <: EntityWithId](entity: E): Has[E] = apply(entity)
 
-  implicit def fromOptionEntity[E <: EntityWithId](entity: Option[E]): Option[HasEntity[E]] = entity.map(fromEntity)
+  implicit def fromId[E <: EntityWithId](id: E#ID): Has[E] = apply(id)
+
+  implicit def fromOption[E <: EntityWithId](entity: Option[E]): Option[Has[E]] = apply(entity)
 
   implicit def toOption[E <: EntityWithId](entity: Has[E]): Some[Has[E]] = Some(entity)
 

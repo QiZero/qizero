@@ -1,8 +1,8 @@
 package qizero.action.db
 
-import scala.slick.lifted.Query
-import qizero.model.{Page, Pagination, Slice}
+import qizero.model._
 import qizero.persistence.DAL
+import slick.lifted.Query
 
 sealed trait QueriedFindAction[R] extends QueriedAction[R] {
   self: DBAction[_] =>
