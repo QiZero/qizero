@@ -47,10 +47,10 @@ trait Chuck[T] {
 
 }
 
-final class Slice[T](
-                      val content: Seq[T],
-                      val pagination: Pagination
-                      ) extends Chuck[T] {
+final case class Slice[T](
+                           content: Seq[T],
+                           pagination: Pagination
+                           ) extends Chuck[T] {
 
   lazy val hasNext: Boolean = content.isEmpty
 
@@ -75,11 +75,11 @@ object Slice {
 
 }
 
-final class Page[T](
-                     val content: Seq[T],
-                     val pagination: Pagination,
-                     val total: Int
-                     ) extends Chuck[T] {
+final case class Page[T](
+                          content: Seq[T],
+                          pagination: Pagination,
+                          total: Int
+                          ) extends Chuck[T] {
   require(total >= 0, "Total must not be less than zero!")
 
   val totalPages: Int = Math.ceil(total.toDouble / size.toDouble).toInt
@@ -87,7 +87,6 @@ final class Page[T](
   def hasNext: Boolean = number < totalPages
 
   def map[B](f: T => B): Page[B] = new Page(content.map(f), pagination, total)
-
 }
 
 object Page {
@@ -107,37 +106,18 @@ object Page {
   }
 }
 
-
 final case class Cursor(size: Int, before: Option[String] = None, after: Option[String] = None) {
   require(size > 0, "Size must be equal or greater than zero!")
 }
 
-@implicitNotFound("No implicit CursorWriter defined for ${T}.")
-trait CursorWriter[T] {
-  def write(value: T): String
-}
-
-object CursorWriter {
-  def apply[T](f: T => String) = new CursorWriter[T] {
-    def write(value: T): String = f(value)
-  }
-}
-
-final class Line[T](val content: Seq[T], cursor: Cursor)
-                   (implicit writer: CursorWriter[T]) {
-
-  lazy val before: Option[String] = {
-    content.headOption.map(writer.write).orElse(cursor.before).orElse(cursor.after)
-  }
-
-  lazy val after: Option[String] = {
-    content.lastOption.map(writer.write).orElse(cursor.after).orElse(cursor.before)
-  }
+final case class Line[T](
+                          content: Seq[T],
+                          cursor: Cursor
+                          ) {
 
   def size: Int = cursor.size
 
   def count: Int = content.length
-
 }
 
 object Line {
@@ -147,8 +127,8 @@ object Line {
       "data" -> p.content,
       "paging" -> Json.obj(
         "cursor" -> Json.obj(
-          "before" -> p.before,
-          "after" -> p.after
+          "before" -> p.cursor.before,
+          "after" -> p.cursor.after
         ),
         "size" -> p.size,
         "count" -> p.count

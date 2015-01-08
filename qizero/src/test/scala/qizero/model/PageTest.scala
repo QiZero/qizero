@@ -10,8 +10,6 @@ class PageTest extends WordSpec with Matchers {
 
   @json case class Foo(id: FooId) extends Entity with Id[FooId]
 
-  implicit val writer = CursorWriter[Foo](_.id.value.toString)
-
   "Line" when {
     "Line" should {
 
@@ -21,8 +19,6 @@ class PageTest extends WordSpec with Matchers {
         val line = new Line(content, cursor)
         line.size shouldBe cursor.size
         line.count shouldBe content.length
-        line.before shouldBe Some("1")
-        line.after shouldBe Some("3")
       }
 
       "empty content with before cursor" in {
@@ -31,8 +27,6 @@ class PageTest extends WordSpec with Matchers {
         val line = new Line(content, cursor)
         line.size shouldBe cursor.size
         line.count shouldBe content.length
-        line.before shouldBe Some("1")
-        line.after shouldBe Some("1")
       }
 
       "empty content with after cursor" in {
@@ -41,8 +35,6 @@ class PageTest extends WordSpec with Matchers {
         val line = new Line(content, cursor)
         line.size shouldBe cursor.size
         line.count shouldBe content.length
-        line.before shouldBe Some("3")
-        line.after shouldBe Some("3")
       }
 
       "two content" in {
@@ -51,8 +43,6 @@ class PageTest extends WordSpec with Matchers {
         val line = new Line(content, cursor)
         line.size shouldBe cursor.size
         line.count shouldBe content.length
-        line.before shouldBe Some("1")
-        line.after shouldBe Some("2")
       }
 
       "one content" in {
@@ -61,8 +51,6 @@ class PageTest extends WordSpec with Matchers {
         val line = new Line(content, cursor)
         line.size shouldBe cursor.size
         line.count shouldBe content.length
-        line.before shouldBe Some("5")
-        line.after shouldBe Some("5")
       }
     }
   }
