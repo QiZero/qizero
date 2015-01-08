@@ -1,7 +1,7 @@
 package qizero.model
 
 import play.api.libs.json._
-import annotation.implicitNotFound
+import scala.language.implicitConversions
 
 final case class Pagination(pageNumber: Int, pageSize: Int) {
   require(pageNumber > 0, "Page index must be greater than zero!")
@@ -108,6 +108,18 @@ object Page {
 
 final case class Cursor(size: Int, before: Option[String] = None, after: Option[String] = None) {
   require(size > 0, "Size must be equal or greater than zero!")
+}
+
+object Cursor {
+
+  implicit class UpdatedCursor(cursor: Cursor) {
+    def update[T](content: Seq[T])(implicit write: T => String): Cursor = {
+      val before = content.headOption.map(write).orElse(cursor.before).orElse(cursor.after)
+      val after = content.lastOption.map(write).orElse(cursor.after).orElse(cursor.before)
+      cursor.copy(before = before, after = after)
+    }
+  }
+
 }
 
 final case class Line[T](
