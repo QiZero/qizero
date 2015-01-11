@@ -14,7 +14,6 @@ object Build extends Build {
     .settings(
       addCompilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
       libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-reflect" % _),
-      libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _),
       libraryDependencies ++= provided(slick, playJson, akka),
       libraryDependencies ++= compile(slf4j, config, jodaTime, jodaConvert),
       libraryDependencies ++= test(scalatest, mockito, h2)
