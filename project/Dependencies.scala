@@ -22,8 +22,7 @@ object Dependencies {
   val h2 = "com.h2database" % "h2" % "1.4.184"
 
   // Play
-  val playVersion = "2.3.7"
-  val playJson = "com.typesafe.play" %% "play-json" % playVersion
+  val playJson = "com.typesafe.play" %% "play-json" % "2.3.7"
 
   // Akka
   val akkaVersion = "2.3.8"

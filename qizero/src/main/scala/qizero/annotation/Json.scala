@@ -4,34 +4,50 @@ import scala.annotation.StaticAnnotation
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
-final class json extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro JsonMacro.fromAnnotation
+private object jsonMacroInstance extends jsonMacro(false)
+
+private object jsonStrictMacroInstance extends jsonMacro(true)
+
+/**
+ * "@json" macro annotation for case classes
+ *
+ * This macro annotation automatically creates a JSON serializer for the annotated case class.
+ * The companion object will be automatically created if it does not already exist.
+ *
+ * If the case class has more than one field, the default Play formatter is used.
+ * If the case class has only one field, the field is directly serialized. For example, if A
+ * is defined as:
+ *
+ * case class A(value: Int)
+ *
+ * then A(4) will be serialized as '4' instead of '{"value": 4}'.
+ */
+class json extends StaticAnnotation {
+  def macroTransform(annottees: Any*): Any = macro jsonMacroInstance.impl
 }
 
-//final class jsonNamed(name: String) extends StaticAnnotation
+/**
+ * "@jsonstrict" macro annotation for case classes
+ *
+ * Same as "@json" annotation, except that it always uses the default Play formatter.
+ * For example, if A is defined as:
+ *
+ * case class A(value: Int)
+ *
+ * then A(4) will be serialized as '{"value": 4}'.
+ */
+class jsonstrict extends StaticAnnotation {
+  def macroTransform(annottees: Any*): Any = macro jsonStrictMacroInstance.impl
+}
 
-//final class jsonIgnored extends StaticAnnotation
 
-object JsonMacro {
-
-  def fromAnnotation(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
+private class jsonMacro(isStrict: Boolean) {
+  def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
     import c.universe._
 
-    def modifiedDeclaration(classDef: ClassDef, compDefOpt: Option[ModuleDef] = None) = {
-      val (className, fields) = extractClassNameAndFields(classDef)
-      val format = jsonFormatter(className, fields)
-      val compDef = modifiedCompanion(compDefOpt, format, className)
-
-      // Return both the class and companion object declarations
-      c.Expr( q"""
-          $classDef
-          $compDef
-        """)
-    }
-
-    def extractClassNameAndFields(classDef: ClassDef) = {
+    def extractClassNameAndFields(classDecl: ClassDef) = {
       try {
-        val q"case class $className(..$fields) extends ..$bases { ..$body }" = classDef
+        val q"case class $className(..$fields) extends ..$bases { ..$body }" = classDecl
         (className, fields)
       } catch {
         case _: MatchError => c.abort(c.enclosingPosition, "Annotation is only supported on case class")
@@ -39,45 +55,59 @@ object JsonMacro {
     }
 
     def jsonFormatter(className: TypeName, fields: List[ValDef]) = {
-      val body = fields.length match {
+      fields.length match {
         case 0 => c.abort(c.enclosingPosition, "Cannot create json formatter for case class with no fields")
-        case 1 =>
-          // Only one field, use the serializer for the field
-          q"""{
-                import play.api.libs.json._
-                Format(
-                  __.read[${fields.head.tpt}].map(s => ${className.toTermName}(s)),
-                  new Writes[$className] { def writes(o: $className) = Json.toJson(o.${fields.head.name}) }
-                )
-              }"""
-        case _ =>
-          // More than one field, use Play's macro
-          q"play.api.libs.json.Json.format[$className]"
-      }
-      q"implicit lazy val JsonFormat = $body"
-    }
-
-    def modifiedCompanion(compDefOpt: Option[ModuleDef], format: ValDef, className: TypeName) = {
-      compDefOpt map { compDef =>
-        // Add the formatter to the existing companion object
-        val q"object $obj extends ..$bases { ..$body }" = compDef
-        q"""
-            object $obj extends ..$bases {
-              ..$body
-              $format
+        case 1 if !isStrict => {
+          // use the serializer for the field
+          q"""
+            implicit val jsonAnnotationFormat = {
+              import play.api.libs.json._
+              Format(
+                __.read[${fields.head.tpt}].map(s => ${className.toTermName}(s)),
+                new Writes[$className] { def writes(o: $className) = Json.toJson(o.${fields.head.name}) }
+              )
             }
           """
+        }
+        case _ => {
+          // use Play's macro
+          q"implicit val jsonAnnotationFormat = play.api.libs.json.Json.format[$className]"
+        }
+      }
+    }
+
+    def modifiedCompanion(compDeclOpt: Option[ModuleDef], format: ValDef, className: TypeName) = {
+      compDeclOpt map { compDecl =>
+        // Add the formatter to the existing companion object
+        val q"object $obj extends ..$bases { ..$body }" = compDecl
+        q"""
+          object $obj extends ..$bases {
+            ..$body
+            $format
+          }
+        """
       } getOrElse {
         // Create a companion object with the formatter
         q"object ${className.toTermName} { $format }"
       }
     }
+
+    def modifiedDeclaration(classDecl: ClassDef, compDeclOpt: Option[ModuleDef] = None) = {
+      val (className, fields) = extractClassNameAndFields(classDecl)
+      val format = jsonFormatter(className, fields)
+      val compDecl = modifiedCompanion(compDeclOpt, format, className)
+
+      // Return both the class and companion object declarations
+      c.Expr( q"""
+        $classDecl
+        $compDecl
+      """)
+    }
+
     annottees.map(_.tree) match {
-      case (classDef: ClassDef) :: Nil => modifiedDeclaration(classDef)
-      case (classDef: ClassDef) :: (compDef: ModuleDef) :: Nil => modifiedDeclaration(classDef, Some(compDef))
+      case (classDecl: ClassDef) :: Nil => modifiedDeclaration(classDecl)
+      case (classDecl: ClassDef) :: (compDecl: ModuleDef) :: Nil => modifiedDeclaration(classDecl, Some(compDecl))
       case _ => c.abort(c.enclosingPosition, "Invalid annottee")
     }
   }
-
-
 }
