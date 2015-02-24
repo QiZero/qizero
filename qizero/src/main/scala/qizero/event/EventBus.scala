@@ -6,7 +6,7 @@ class EventBus extends ActorEventBus with LookupClassification {
   type Classifier = Class[_]
   type Event = qizero.event.Event
 
-  protected def mapSize(): Int = 16
+  protected val mapSize: Int = 128
 
   protected def publish(event: Event, subscriber: Subscriber): Unit = {
     subscriber ! event

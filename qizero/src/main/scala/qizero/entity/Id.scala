@@ -1,14 +1,12 @@
 package qizero.entity
 
-
-import qizero.entity.TypedId.Factory
 import scala.annotation.implicitNotFound
 import scala.language.experimental.macros
 import scala.language.implicitConversions
 import scala.reflect.macros.whitebox
 import scala.slick.lifted.MappedTo
 
-trait TypedId extends Any with MappedTo[Long] {
+trait TypedId extends Any {
   def value: Long
 
   override def toString: String = value.toString
@@ -44,9 +42,8 @@ private object TypedIdMacro {
 
     implicitCandidates match {
       case to :: Nil =>
-        q"""
-          new _root_.qizero.entity.TypedId.Factory[$to] {
-          def apply(id: Long) = new $to(id)
+        q"""new _root_.qizero.entity.TypedId.Factory[$to] {
+              def apply(id: Long) = new $to(id)
         }"""
       case l => c.abort(NoPosition, s"There are ${l.size} implicit candidates found. There should be only 1.")
     }
