@@ -50,7 +50,7 @@ final class CompiledFindPage[R, C[_]](val compiled: RunnableCompiled[_ <: Query[
 
   protected def act(): Page[R] = {
     val query = compiled.extract
-    val queryPage = query.drop(pagination.offset).take(pagination.pageSize)
+    val queryPage = query.drop(pagination.offset).take(pagination.size)
     val result = queryPage.list
     val total = query.length.run
     new Page(result, pagination, total)
@@ -65,7 +65,7 @@ final class CompiledFindSlice[R, C[_]](val compiled: RunnableCompiled[_ <: Query
 
   protected def act(): Slice[R] = {
     val query = compiled.extract
-    val queryPage = query.drop(pagination.offset).take(pagination.pageSize)
+    val queryPage = query.drop(pagination.offset).take(pagination.size)
     val result = queryPage.list
     new Slice(result, pagination)
   }

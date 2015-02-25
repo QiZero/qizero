@@ -46,7 +46,7 @@ final class QueriedFindPage[R](_query: Query[_, R, Seq], val pagination: Paginat
 
   import dal.profile.simple._
 
-  lazy val query = _query.drop(pagination.offset).take(pagination.pageSize)
+  lazy val query = _query.drop(pagination.offset).take(pagination.size)
 
   protected def act(): Page[R] = {
     val result = query.list
@@ -61,7 +61,7 @@ final class QueriedFindSlice[R](_query: Query[_, R, Seq], val pagination: Pagina
 
   import dal.profile.simple._
 
-  lazy val query = _query.drop(pagination.offset).take(pagination.pageSize)
+  lazy val query = _query.drop(pagination.offset).take(pagination.size)
 
   protected def act(): Slice[R] = {
     val result = query.list

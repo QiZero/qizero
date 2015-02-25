@@ -3,31 +3,33 @@ package qizero.model
 import play.api.libs.json._
 import scala.language.implicitConversions
 
-final case class Pagination(pageNumber: Int, pageSize: Int) {
-  require(pageNumber > 0, "Page index must be greater than zero!")
-  require(pageSize > 0, "Size must be equal or greater than zero!")
+final case class Pagination(page: Int, size: Int) {
+  require(page > 0, "Page index must be greater than zero!")
+  require(size > 0, "Size must be equal or greater than zero!")
 
-  val offset: Int = (pageNumber - 1) * pageSize
+  val offset: Int = (page - 1) * size
 
-  def next: Pagination = Pagination(pageNumber + 1, pageSize)
+  def next: Pagination = Pagination(page + 1, size)
 
   def previous: Pagination = {
-    if (pageNumber <= 1) this
-    else Pagination(pageNumber - 1, pageSize)
+    if (page <= 1) this
+    else Pagination(page - 1, size)
   }
 
-  def first: Pagination = Pagination(1, pageSize)
+  def first: Pagination = Pagination(1, size)
 }
 
-trait Chuck[T] {
+trait Paging[T] {
+  def content: Seq[T]
+}
+
+trait Chuck[T] extends Paging[T] {
 
   def pagination: Pagination
 
-  def content: Seq[T]
+  def page: Int = pagination.page
 
-  def number: Int = pagination.pageNumber
-
-  def size: Int = pagination.pageSize
+  def size: Int = pagination.size
 
   def count: Int = content.length
 
@@ -39,7 +41,7 @@ trait Chuck[T] {
 
   def hasNext: Boolean
 
-  def hasPrevious: Boolean = number > 1
+  def hasPrevious: Boolean = page > 1
 
   def next: Pagination = pagination.next
 
@@ -64,7 +66,7 @@ object Slice {
     Json.obj(
       "data" -> p.content,
       "paging" -> Json.obj(
-        "number" -> p.number,
+        "page" -> p.page,
         "size" -> p.size,
         "count" -> p.count,
         "hasNext" -> p.hasNext,
@@ -84,7 +86,7 @@ final case class Page[T](
 
   val totalPages: Int = Math.ceil(total.toDouble / size.toDouble).toInt
 
-  def hasNext: Boolean = number < totalPages
+  def hasNext: Boolean = page < totalPages
 
   def map[B](f: T => B): Page[B] = new Page(content.map(f), pagination, total)
 }
@@ -95,7 +97,7 @@ object Page {
     Json.obj(
       "data" -> p.content,
       "paging" -> Json.obj(
-        "number" -> p.number,
+        "page" -> p.page,
         "size" -> p.size,
         "count" -> p.count,
         "total" -> p.total,
@@ -106,7 +108,7 @@ object Page {
   }
 }
 
-final case class Cursor(size: Int, before: Option[String] = None, after: Option[String] = None) {
+final case class Cursor(size: Int, after: Option[String] = None, before: Option[String] = None) {
   require(size > 0, "Size must be equal or greater than zero!")
 }
 
@@ -114,9 +116,9 @@ object Cursor {
 
   implicit class UpdatedCursor(cursor: Cursor) {
     def update[T](content: Seq[T])(implicit write: T => String): Cursor = {
-      val before = content.headOption.map(write).orElse(cursor.before).orElse(cursor.after)
-      val after = content.lastOption.map(write).orElse(cursor.after).orElse(cursor.before)
-      cursor.copy(before = before, after = after)
+      val after = content.headOption.map(write).orElse(cursor.after).orElse(cursor.before)
+      val before = content.lastOption.map(write).orElse(cursor.before).orElse(cursor.after)
+      cursor.copy(after = after, before = before)
     }
   }
 
@@ -125,7 +127,7 @@ object Cursor {
 final case class Line[T](
                           content: Seq[T],
                           cursor: Cursor
-                          ) {
+                          ) extends Paging[T] {
 
   def size: Int = cursor.size
 
@@ -134,14 +136,12 @@ final case class Line[T](
 
 object Line {
 
-  implicit def CursoredChuckWrites[T: Writes]: Writes[Line[T]] = Writes { p: Line[T] =>
+  implicit def LineWrites[T: Writes]: Writes[Line[T]] = Writes { p: Line[T] =>
     Json.obj(
       "data" -> p.content,
       "paging" -> Json.obj(
-        "cursor" -> Json.obj(
-          "before" -> p.cursor.before,
-          "after" -> p.cursor.after
-        ),
+        "after" -> p.cursor.after,
+        "before" -> p.cursor.before,
         "size" -> p.size,
         "count" -> p.count
       )
