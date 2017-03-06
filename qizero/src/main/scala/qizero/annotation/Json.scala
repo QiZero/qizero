@@ -2,7 +2,7 @@ package qizero.annotation
 
 import scala.annotation.StaticAnnotation
 import scala.language.experimental.macros
-import scala.reflect.macros.blackbox.Context
+import scala.reflect.macros._
 
 private object jsonMacroInstance extends jsonMacro(false)
 
@@ -42,7 +42,7 @@ class jsonstrict extends StaticAnnotation {
 
 
 private class jsonMacro(isStrict: Boolean) {
-  def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
+  def impl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
     import c.universe._
 
     def extractClassNameAndFields(classDecl: ClassDef) = {

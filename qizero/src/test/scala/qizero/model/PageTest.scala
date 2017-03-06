@@ -3,6 +3,7 @@ package qizero.model
 import org.scalatest.{Matchers, WordSpec}
 import qizero.annotation.json
 import qizero.entity.{Entity, Id, TypedId}
+import scala.language.implicitConversions
 
 class PageTest extends WordSpec with Matchers {
 

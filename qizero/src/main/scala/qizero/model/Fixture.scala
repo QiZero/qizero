@@ -1,9 +1,10 @@
 package qizero.model
 
+import org.joda.time._
+import qizero.entity.Has
 import scala.annotation.implicitNotFound
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
-import org.joda.time._
 
 trait Fixture extends DefaultFixtures {
   def seed[T](implicit factory: Fixture.Factory[T]): T = factory()
@@ -26,19 +27,18 @@ object Fixture extends Fixture {
       val tpe = weakTypeOf[T]
 
       val random = q"scala.util.Random"
+      val entity = q"_root_.qizero.entity"
       val fixture = q"_root_.qizero.model.Fixture"
 
       val constructor = tpe.decl(termNames.CONSTRUCTOR) match {
-        case NoSymbol => c.abort(c.enclosingPosition, "model constructor not found")
+        case NoSymbol => c.abort(c.enclosingPosition, "Seed constructor not found")
         case s => s.asMethod
       }
 
       val params = constructor.paramLists.head
-
       val seedParams = params.flatMap { param =>
         val paramName = param.name.toTermName
         val paramType = param.typeSignature
-
         if (param.asTerm.isParamWithDefault) None
         else if (paramType <:< typeOf[String]) Some( q"""$paramName = ${paramName.decodedName.toString + "-"}+$random.nextInt(10000)""")
         else if (paramType <:< typeOf[Boolean]) Some( q"""$paramName = $random.nextBoolean""")
@@ -50,10 +50,10 @@ object Fixture extends Fixture {
         else if (paramType <:< typeOf[Double]) Some( q"""$paramName = $random.nextDouble""")
         else if (paramType <:< typeOf[BigDecimal]) Some( q"""$paramName = BigDecimal($random.nextInt)""")
         else if (paramType <:< typeOf[Option[_]]) Some(q"$paramName = None")
+        else if (paramType <:< typeOf[Has[_]]) Some(q"$paramName = $entity.Has($fixture.seed[${paramType.typeArgs(0)}])")
         else Some(q"$paramName = $fixture.seed[$paramType]")
       }
-
-      q"""new $fixture.Factory[$tpe]{ def apply():$tpe = new $tpe(..$seedParams) }"""
+      q"new $fixture.Factory[$tpe]{ def apply():$tpe = new $tpe(..$seedParams) }"
     }
   }
 

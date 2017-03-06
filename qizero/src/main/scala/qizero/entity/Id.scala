@@ -6,7 +6,7 @@ import scala.language.implicitConversions
 import scala.reflect.macros.whitebox
 import scala.slick.lifted.MappedTo
 
-trait TypedId extends Any {
+trait TypedId extends Any with MappedTo[Long] {
   def value: Long
 
   override def toString: String = value.toString

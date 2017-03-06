@@ -108,6 +108,12 @@ object Page {
   }
 }
 
+
+trait CursorA[T] {
+  def size:Int
+  def after:Option[T]
+  def before:Option[T]
+}
 final case class Cursor(size: Int, after: Option[String] = None, before: Option[String] = None) {
   require(size > 0, "Size must be equal or greater than zero!")
 }

@@ -39,7 +39,7 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
     }
     "find page" in new WithData {
       val result = Foos.find.page(Pagination(1, 10)).run
-      result.number shouldBe 1
+      result.page shouldBe 1
       result.size shouldBe 10
       result.count shouldBe 10
       result.total shouldBe numElems
@@ -47,7 +47,7 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
     }
     "find slice" in new WithData {
       val result = Foos.find.slice(Pagination(1, 10)).run
-      result.number shouldBe 1
+      result.page shouldBe 1
       result.size shouldBe 10
       result.count shouldBe 10
     }
@@ -75,7 +75,7 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
     }
     "find page" in new WithData {
       val result = Foos.find.as[Foo].page(Pagination(1, 20)).run
-      result.number shouldBe 1
+      result.page shouldBe 1
       result.size shouldBe 20
       result.count shouldBe 20
       result.totalPages shouldBe 3
@@ -83,7 +83,7 @@ class FinderTest extends WordSpec with Matchers with DBSpec {
     }
     "find slice" in new WithData {
       val result = Foos.find.as[Foo].slice(Pagination(1, 20)).run
-      result.number shouldBe 1
+      result.page shouldBe 1
       result.size shouldBe 20
       result.count shouldBe 20
     }
