@@ -4,36 +4,35 @@ object Dependencies {
 
   val resolvers = Seq(
     Resolver.sonatypeRepo("releases"),
-    "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases/"
+    "Typesafe Repo" at "https://repo.typesafe.com/typesafe/releases/"
   )
   // Util
-  val jodaTime = "joda-time" % "joda-time" % "2.3"
-  val jodaConvert = "org.joda" % "joda-convert" % "1.4"
+  val jodaTime = "joda-time" % "joda-time" % "2.10.9"
+  val jodaConvert = "org.joda" % "joda-convert" % "1.9.2"
 
   // Logging
-  val slf4j = "org.slf4j" % "slf4j-api" % "1.7.7"
+  val slf4j = "org.slf4j" % "slf4j-api" % "1.7.30"
   val logback = "ch.qos.logback" % "logback-classic" % "1.1.2"
 
   // Config
-  val config = "com.typesafe" % "config" % "1.2.1"
+  val config = "com.typesafe" % "config" % "1.4.1"
 
   // Persistence
   val slick = "com.typesafe.slick" %% "slick" % "2.1.0"
-  val h2 = "com.h2database" % "h2" % "1.3.176"
+  val h2 = "com.h2database" % "h2" % "1.4.200"
 
   // Play
-  val playVersion = "2.3.3"
-  val playJson = "com.typesafe.play" %% "play-json" % playVersion
+  val playJson = "com.typesafe.play" %% "play-json" % "2.9.2"
 
   // Akka
-  val akkaVersion = "2.3.5"
+  val akkaVersion = "2.6.11"
   val akka = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion
 
   // Test
-  val scalatest = "org.scalatest" %% "scalatest" % "2.2.1"
-  val mockito = "org.mockito" % "mockito-core" % "1.9.5"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.1.4"
+  val mockito = "org.mockito" % "mockito-core" % "3.7.7"
 
   // -------------------------------------------------------------------------------------------------------------------
   // Utils
@@ -41,7 +40,7 @@ object Dependencies {
   def compile(deps: ModuleID*): Seq[ModuleID] = deps.map(_ % "compile")
   def provided(deps: ModuleID*): Seq[ModuleID] = deps.map(_ % "provided")
   def optional(deps: ModuleID*): Seq[ModuleID] = deps.map(_ % "optional")
-  def test(deps: ModuleID*): Seq[ModuleID] = deps.map(_ % "test")
+  def test(deps: ModuleID*): Seq[ModuleID] = deps.map(_ % Test)
   def runtime(deps: ModuleID*): Seq[ModuleID] = deps.map(_ % "runtime")
   def container(deps: ModuleID*): Seq[ModuleID] = deps.map(_ % "container")
 }

@@ -6,18 +6,18 @@ object BuildSettings {
   object Basic {
     val settings = Seq(
       organization := "qizero",
-      scalaVersion := "2.11.2",
+      scalaVersion := "2.12.13",
       resolvers ++= Dependencies.resolvers,
       scalacOptions ++= Seq(
         "-encoding", "UTF-8",
         "-deprecation",
         "-feature",
         "-unchecked",
-        "-target:jvm-1.7"
+        "-target:jvm-1.8"
       ),
       javacOptions ++= Seq(
-        "-source", "1.7",
-        "-target", "1.7"
+        "-source", "1.8",
+        "-target", "1.8"
       ),
       shellPrompt := (s => "[" + Project.extract(s).currentProject.id + "] $ ")
     ) ++ Publish.settings ++ Release.settings
